@@ -7,6 +7,9 @@
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/SetCameraInfo.h>
+//#include <camera_calibration_parsers/parse_ini.h>
 
 #include <unistd.h>
 #include <sys/ipc.h>
@@ -14,6 +17,7 @@
 
 //forward declarations
 static gboolean processData(GstPad *pad, GstBuffer *buffer, gpointer u_data);
+bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp);
 
 //globals
 bool gstreamerPad, rosPad;
@@ -88,6 +92,8 @@ int main(int argc, char** argv) {
 	image_transport::ImageTransport it(nh);
 	image_transport::Publisher pub = it.advertise("gscam/image_raw", 1);
 
+	ros::ServiceServer set_camera_info = nh.advertiseService("gscam/set_camera_info", setCameraInfo);
+
 	std::cout << "Processing..." << std::endl;
 
 	//processVideo
@@ -142,4 +148,12 @@ static gboolean processData(GstPad *pad, GstBuffer *gBuffer, gpointer u_data) {
 
 	rosPad = true;
 	return TRUE;
+}
+
+bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp) {
+
+  ROS_INFO("New camera info received");
+  //  sensor_msgs::CameraInfo &cam_info = req.camera_info;
+  
+  return TRUE;
 }
