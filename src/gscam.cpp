@@ -23,6 +23,7 @@ bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCam
 bool gstreamerPad, rosPad;
 int width, height;
 unsigned char *buffer = NULL;
+sensor_msgs::CameraInfo camera_info;
 
 int main(int argc, char** argv) {
 	char *config = getenv("GSCAM_CONFIG");
@@ -90,7 +91,7 @@ int main(int argc, char** argv) {
 	}
 
 	image_transport::ImageTransport it(nh);
-	image_transport::Publisher pub = it.advertise("gscam/image_raw", 1);
+	image_transport::CameraPublisher pub = it.advertiseCamera("gscam/image_raw", 1);
 
 	ros::ServiceServer set_camera_info = nh.advertiseService("gscam/set_camera_info", setCameraInfo);
 
@@ -116,7 +117,7 @@ int main(int argc, char** argv) {
 		msg.data.resize(width*height*3);
 		std::copy(buffer, buffer+(width*height*3), msg.data.begin());
 
-		pub.publish(msg);
+		pub.publish(msg, camera_info);
 
 		ros::spinOnce();
 
@@ -153,7 +154,7 @@ static gboolean processData(GstPad *pad, GstBuffer *gBuffer, gpointer u_data) {
 bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp) {
 
   ROS_INFO("New camera info received");
-  //  sensor_msgs::CameraInfo &cam_info = req.camera_info;
-  
-  return TRUE;
+  camera_info = req.camera_info;
+ 
+  return true;
 }
