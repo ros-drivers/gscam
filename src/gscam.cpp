@@ -62,6 +62,15 @@ int main(int argc, char** argv) {
 		std::cout << "stream is PAUSED." << std::endl;
 	}
 
+	// We could probably do something with the camera name, check
+	// errors or something, but at the moment, we don't care.
+	std::string camera_name;
+	if (camera_calibration_parsers::readCalibrationIni("camera_parameters.txt", camera_name, camera_info)) {
+	  ROS_INFO("Successfully read camera calibration.  Rerun camera calibrator if it is incorrect.");
+	}
+	else {
+	  ROS_INFO("No camera calibration file.  Please run camera calibrator to obtain rectified images.");
+	}
 
 	ros::init(argc, argv, "gscam_publisher");
 	ros::NodeHandle nh;
