@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 	  ROS_INFO("Successfully read camera calibration.  Rerun camera calibrator if it is incorrect.");
 	}
 	else {
-	  ROS_INFO("No camera calibration file.  Please run camera calibrator to obtain rectified images.");
+	  ROS_ERROR("No camera_parameters.txt file found.  Use default file if no other is available.");
 	}
 
 	ros::init(argc, argv, "gscam_publisher");
