@@ -9,7 +9,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
-//#include <camera_calibration_parsers/parse_ini.h>
+#include <camera_calibration_parsers/parse_ini.h>
 
 #include <unistd.h>
 #include <sys/ipc.h>
@@ -155,6 +155,13 @@ bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCam
 
   ROS_INFO("New camera info received");
   camera_info = req.camera_info;
- 
-  return true;
+
+  if (camera_calibration_parsers::writeCalibrationIni("camera_parameters.txt", "gscam", camera_info)) {
+    ROS_INFO("Camera information written to camera_parameters.txt");
+    return true;
+  }
+  else {
+    ROS_ERROR("Could not write camera_parameters.txt");
+    return false;
+  }
 }

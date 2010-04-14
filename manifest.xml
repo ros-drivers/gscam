@@ -14,6 +14,7 @@ devices such as webcams.
   <depend package="roscpp"/>
   <depend package="image_transport"/>
   <depend package="sensor_msgs"/>
+  <depend package="camera_calibration_parsers" />
 
 </package>
 
