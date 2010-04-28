@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 	// We could probably do something with the camera name, check
 	// errors or something, but at the moment, we don't care.
 	std::string camera_name;
-	if (camera_calibration_parsers::readCalibrationIni("camera_parameters.txt", camera_name, camera_info)) {
+	if (camera_calibration_parsers::readCalibrationIni("../camera_parameters.txt", camera_name, camera_info)) {
 	  ROS_INFO("Successfully read camera calibration.  Rerun camera calibrator if it is incorrect.");
 	}
 	else {
@@ -165,7 +165,7 @@ bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCam
   ROS_INFO("New camera info received");
   camera_info = req.camera_info;
 
-  if (camera_calibration_parsers::writeCalibrationIni("camera_parameters.txt", "gscam", camera_info)) {
+  if (camera_calibration_parsers::writeCalibrationIni("../camera_parameters.txt", "gscam", camera_info)) {
     ROS_INFO("Camera information written to camera_parameters.txt");
     return true;
   }
