@@ -1,9 +1,6 @@
 <package>
   <description brief="gscam">
-
-A ROS camera driver that uses gstreamer to connect to Video4Linux
-devices such as webcams.
-
+A ROS camera driver that uses gstreamer to connect to devices such as webcams.
   </description>
   <author>Graylin Trevor Jay, Christopher Crick</author>
   <email>tjay@cs.brown.edu, chriscrick@cs.brown.edu</email>
