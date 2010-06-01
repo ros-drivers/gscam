@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
 
 	image_transport::ImageTransport it(nh);
 	image_transport::CameraPublisher pub = it.advertiseCamera("gscam/image_raw", 1);
+	image_transport::Publisher trans = it.advertise("gscam/image", 1);
 
 	ros::ServiceServer set_camera_info = nh.advertiseService("gscam/set_camera_info", setCameraInfo);
 
@@ -127,6 +128,7 @@ int main(int argc, char** argv) {
 		std::copy(buffer, buffer+(width*height*3), msg.data.begin());
 
 		pub.publish(msg, camera_info);
+		trans.publish(msg);
 
 		ros::spinOnce();
 
