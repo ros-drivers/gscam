@@ -104,13 +104,17 @@ int main(int argc, char** argv) {
 
 	ros::ServiceServer set_camera_info = nh.advertiseService("gscam/set_camera_info", setCameraInfo);
 
+	//set max framerate 
+	int fps;
+	nh.param("brown/gscam/fps", fps, 200);
+	ros::Rate loop_rate(fps);
+
 	std::cout << "Processing..." << std::endl;
 
 	//processVideo
 	rosPad = false;
 	gstreamerPad = true;
 	gst_element_set_state(pipeline, GST_STATE_PLAYING);
-	ros::Rate loop_rate(200);
 	while(nh.ok()) {
 		loop_rate.sleep();
 
