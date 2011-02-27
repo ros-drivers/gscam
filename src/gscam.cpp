@@ -2,7 +2,10 @@
 #include <unistd.h>
 
 #include <iostream>
+extern "C"{
 #include <gst/gst.h>
+#include <gst/app/gstappsink.h>
+}
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -22,7 +25,6 @@ bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCam
 //globals
 bool gstreamerPad, rosPad;
 int width, height;
-unsigned char *buffer = NULL;
 sensor_msgs::CameraInfo camera_info;
 
 int main(int argc, char** argv) {
@@ -41,19 +43,53 @@ int main(int argc, char** argv) {
 		std::cout << error->message << std::endl;
 		exit(-1);
 	}
+	GstElement * sink = gst_element_factory_make("appsink",NULL);
+	GstCaps * caps = gst_caps_new_simple("video/x-raw-rgb", NULL);
+	gst_app_sink_set_caps(GST_APP_SINK(sink), caps);
+	gst_caps_unref(caps);
 
-	GstElement *probe = gst_bin_get_by_name(GST_BIN(pipeline), "ros");
-	if (probe == NULL) {
-		std::cout << "Your Gstreamer pipeline needs an identity element named \"ros\"." << std::endl;
-		exit(-1);
+	gst_base_sink_set_sync(GST_BASE_SINK(sink), TRUE);
+
+	if(GST_IS_PIPELINE(pipeline)) {
+	    GstPad *outpad = gst_bin_find_unlinked_pad(GST_BIN(pipeline), GST_PAD_SRC);
+	    g_assert(outpad);
+	    GstElement *outelement = gst_pad_get_parent_element(outpad);
+	    g_assert(outelement);
+	    gst_object_unref(outpad);
+
+
+	    if(!gst_bin_add(GST_BIN(pipeline), sink)) {
+		fprintf(stderr, "gst_bin_add() failed\n"); // TODO: do some unref
+		gst_object_unref(outelement);
+		gst_object_unref(pipeline);
+		return -1;
+	    }
+
+	    if(!gst_element_link(outelement, sink)) {
+		fprintf(stderr, "GStreamer: cannot link outelement(\"%s\") -> sink\n", gst_element_get_name(outelement));
+		gst_object_unref(outelement);
+		gst_object_unref(pipeline);
+		return -1;
+	    }
+
+	    gst_object_unref(outelement);
+	} else {
+	    GstElement* launchpipe = pipeline;
+	    pipeline = gst_pipeline_new(NULL);
+	    g_assert(pipeline);
+
+	    gst_object_unparent(GST_OBJECT(launchpipe));
+
+	    gst_bin_add_many(GST_BIN(pipeline), launchpipe, sink, NULL);
+
+	    if(!gst_element_link(launchpipe, sink)) {
+		fprintf(stderr, "GStreamer: cannot link launchpipe -> sink\n");
+		gst_object_unref(pipeline);
+		return -1;
+	    }
 	}
 
-	GstPad *pad = gst_element_get_pad(probe, "src"); 
-	gst_pad_add_buffer_probe(pad, G_CALLBACK(processData), NULL);
-
 	gst_element_set_state(pipeline, GST_STATE_PAUSED);
-
-	gst_object_unref(pad);
 
 	if (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {
 		std::cout << "Failed to PAUSE." << std::endl;
@@ -104,11 +140,6 @@ int main(int argc, char** argv) {
 
 	ros::ServiceServer set_camera_info = nh.advertiseService("gscam/set_camera_info", setCameraInfo);
 
-	//set max framerate 
-	int fps;
-	nh.param("brown/gscam/fps", fps, 200);
-	ros::Rate loop_rate(fps);
-
 	std::cout << "Processing..." << std::endl;
 
 	//processVideo
@@ -116,52 +147,40 @@ int main(int argc, char** argv) {
 	gstreamerPad = true;
 	gst_element_set_state(pipeline, GST_STATE_PLAYING);
 	while(nh.ok()) {
-		loop_rate.sleep();
+                // This should block until a new frame is awake, this way, we'll run at the 
+                // actual capture framerate of the device.
+		GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink));
+		if (!buf) continue;
 
-		if (!rosPad) continue;
-		rosPad = false;
+		GstPad* pad = gst_element_get_static_pad(sink, "sink");
+		const GstCaps *caps = gst_pad_get_negotiated_caps(pad);
+		GstStructure *structure = gst_caps_get_structure(caps,0);
+		gst_structure_get_int(structure,"width",&width);
+		gst_structure_get_int(structure,"height",&height);
 
 		sensor_msgs::Image msg;
-		msg.width = width;
+		msg.width = width; 
 		msg.height = height;
 		msg.encoding = "rgb8";
 		msg.is_bigendian = false;
 		msg.step = width*3;
 		msg.data.resize(width*height*3);
-		std::copy(buffer, buffer+(width*height*3), msg.data.begin());
+		std::copy(buf->data, buf->data+(width*height*3), msg.data.begin());
 
 		pub.publish(msg, camera_info);
 
+                gst_buffer_unref(buf);
+
 		ros::spinOnce();
 
-		gstreamerPad = true;
 	}
 
 	//close out
 	std::cout << "\nquitting..." << std::endl;
 	gst_element_set_state(pipeline, GST_STATE_NULL);
 	gst_object_unref(pipeline);
-	free(buffer);
 
 	return 0;
-}
-
-static gboolean processData(GstPad *pad, GstBuffer *gBuffer, gpointer u_data) {
-	if (!gstreamerPad) return TRUE;
-	gstreamerPad = false;
-
-	if (buffer == NULL) {
-		const GstCaps *caps = gst_pad_get_negotiated_caps(pad);
-		GstStructure *structure = gst_caps_get_structure(caps,0);
-		gst_structure_get_int(structure,"width",&width);
-		gst_structure_get_int(structure,"height",&height);
-		buffer = (unsigned char*) malloc(sizeof(unsigned char)*width*height*3);
-	}
-
-	memcpy(buffer, gBuffer->data, sizeof(unsigned char)*width*height*3);
-
-	rosPad = true;
-	return TRUE;
 }
 
 bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp) {

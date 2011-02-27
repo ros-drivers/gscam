@@ -1,3 +1,6 @@
 libgstreamer0.10-dev:
   ubuntu:
     libgstreamer0.10-dev
+libgstreamer-plugins-base0.10-dev:
+  ubuntu:
+    libgstreamer-plugins-base0.10-dev
