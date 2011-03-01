@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
                 // This should block until a new frame is awake, this way, we'll run at the 
                 // actual capture framerate of the device.
 		GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink));
-		if (!buf) continue;
+		if (!buf) break;
 
 		GstPad* pad = gst_element_get_static_pad(sink, "sink");
 		const GstCaps *caps = gst_pad_get_negotiated_caps(pad);
