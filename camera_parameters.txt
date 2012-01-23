@@ -3,10 +3,10 @@
 [image]
 
 width
-640
+320
 
 height
-480
+240
 
 [default]
 
