@@ -158,8 +158,19 @@ int main(int argc, char** argv) {
 		gst_structure_get_int(structure,"width",&width);
 		gst_structure_get_int(structure,"height",&height);
 
+		// Don't segfault if we get an unexpected buffer size
+		if (buf->size < width * height * 3) {
+			static bool warning = false;
+			if (!warning) {
+				warning = true;
+				std::cout << "warning: expected frame to be " << (width * height * 3) << " bytes but got only "
+					<< buf->size << " bytes, ignoring unusable frames (make sure frames are raw RGB encoded)" << std::endl;
+			}
+			continue;
+		}
+
 		sensor_msgs::Image msg;
-		msg.width = width; 
+		msg.width = width;
 		msg.height = height;
 		msg.encoding = "rgb8";
 		msg.is_bigendian = false;
