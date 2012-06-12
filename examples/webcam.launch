@@ -1,0 +1,10 @@
+<launch>
+  <!-- This launchfile should bring up a st -->
+  <node name="webcam" pkg="gscam" type="gscam" output="screen">
+    <param name="camera_parameters_file" value="$(find gscam)/examples/webcam_parameters.txt"/>
+    <param name="gscam_config" value="v4l2src device=/dev/video0 ! video/x-raw-rgb,framerate=30/1 ! ffmpegcolorspace"/>
+    <param name="frame_id" value="/webcam_frame"/>
+  </node>
+
+  <node name="webcam_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /webcam_frame 10"/>
+</launch>
