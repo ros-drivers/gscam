@@ -1,34 +1,50 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+# 3rd-party Dependencies
+find_package(PkgConfig)
+pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
 
-rosbuild_init()
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+if(USE_ROSBUILD)
+  # Use rosbuild
+  include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-#uncomment if you have defined messages
-#rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
+  rosbuild_init()
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+  set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+  set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-include_directories(/usr/include/gstreamer-0.10 /usr/include/glib-2.0 /usr/lib/glib-2.0/include /usr/lib/i386-linux-gnu/glib-2.0/include /usr/lib/x86_64-linux-gnu/glib-2.0/include /usr/include/libxml2)
-rosbuild_add_executable(gscam src/gscam.cpp)
-target_link_libraries(gscam gstreamer-0.10 gstbase-0.10 gobject-2.0 gmodule-2.0 gthread-2.0 rt xml2 glib-2.0 gstapp-0.10 pthread)
+  include_directories(${GLIB_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${GSTREAMER_INCLUDE_DIRS})
+  rosbuild_add_executable(gscam src/gscam.cpp)
+  target_link_libraries(gscam
+    gstreamer-0.10 gstbase-0.10 
+    gobject-2.0 gmodule-2.0 gthread-2.0
+    rt xml2 glib-2.0 gstapp-0.10
+    pthread)
+else()
+  # Use Catkin
+  project(gscam)
+
+  find_package(catkin REQUIRED 
+    COMPONENTS roscpp image_transport sensor_msgs camera_calibration_parsers opencv)
+
+  catkin_package(
+    INCLUDE_DIRS include
+    #LIBRARIES ${PROJECT_NAME}
+    CATKIN_DEPENDS roscpp image_transport sensor_msgs camera_calibration_parsers opencv
+    #DEPENDS opencv
+    )
+
+  include_directories(${catkin_INCLUDE_DIRS} ${GLIB_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${GSTREAMER_INCLUDE_DIRS})
+  add_executable(gscam src/gscam.cpp)
+  target_link_libraries(gscam
+    ${catkin_LIBRARIES}
+    gstreamer-0.10 gstbase-0.10 
+    gobject-2.0 gmodule-2.0 gthread-2.0
+    rt xml2 glib-2.0 gstapp-0.10
+    pthread)
+
+endif()
+
