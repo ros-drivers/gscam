@@ -15,6 +15,7 @@
 
   <build_depend>libgstreamer0.10-dev</build_depend>
   <build_depend>libgstreamer-plugins-base0.10-dev</build_depend>
+
   <build_depend>opencv2</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>image_transport</build_depend>
