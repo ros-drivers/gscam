@@ -19,7 +19,7 @@ extern "C"{
 #include <sys/shm.h>
 
 //forward declarations
-static gboolean processData(GstPad *pad, GstBuffer *buffer, gpointer u_data);
+//static gboolean processData(GstPad *pad, GstBuffer *buffer, gpointer u_data);
 bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp);
 
 // Globals / camera configuration
@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     gst_structure_get_int(structure,"height",&height);
 
 		// Complain if the returned buffer is smaller than we expect
-		if (buf->size < width * height * 3) {
+		if (buf->size < unsigned(width * height * 3)) {
       ROS_WARN_STREAM( "GStreamer image buffer underflow: Expected frame to be "
           << (width * height * 3) << " bytes but got only "
           << (buf->size) << " bytes. (make sure frames are raw RGB encoded)");
