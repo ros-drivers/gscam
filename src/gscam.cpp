@@ -177,10 +177,9 @@ int main(int argc, char** argv) {
   }
 
   // Create ROS camera interface
-  ros::NodeHandle nh_private = ros::NodeHandle("~");
-  image_transport::ImageTransport it(nh_private);
-  image_transport::CameraPublisher pub = it.advertiseCamera("image_raw", 1);
-  ros::ServiceServer set_camera_info = nh_private.advertiseService("set_camera_info", setCameraInfo);
+  image_transport::ImageTransport it(nh);
+  image_transport::CameraPublisher pub = it.advertiseCamera("camera/image_raw", 1);
+  ros::ServiceServer set_camera_info = nh.advertiseService("camera/set_camera_info", setCameraInfo);
 
   ROS_INFO_STREAM("Processing...");
 
