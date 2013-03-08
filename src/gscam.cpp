@@ -19,8 +19,18 @@ extern "C"{
 #include <sys/shm.h>
 
 //forward declarations
-//static gboolean processData(GstPad *pad, GstBuffer *buffer, gpointer u_data);
 bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp);
+
+// Example callbacks for appsink
+// TODO: enable callback-based capture
+void gst_eos_cb(GstAppSink *appsink, gpointer user_data ) {
+}
+GstFlowReturn gst_new_preroll_cb(GstAppSink *appsink, gpointer user_data ) {
+  return GST_FLOW_OK;
+}
+GstFlowReturn gst_new_asample_cb(GstAppSink *appsink, gpointer user_data ) {
+  return GST_FLOW_OK;
+}
 
 // Globals / camera configuration
 bool gstreamerPad, rosPad;
@@ -69,7 +79,12 @@ int main(int argc, char** argv) {
   gst_app_sink_set_caps(GST_APP_SINK(sink), caps);
   gst_caps_unref(caps);
 
-  gst_base_sink_set_sync(GST_BASE_SINK(sink), TRUE);
+  // Set whether the sink should sync
+  // Sometimes setting this to true can cause a large number of frames to be
+  // dropped
+  bool sync_sink;
+  ros::param::get("~/sync_sink", sync_sink, true);
+  gst_base_sink_set_sync(GST_BASE_SINK(sink), (sync_sink) ? TRUE : FALSE);
 
   if(GST_IS_PIPELINE(pipeline)) {
     GstPad *outpad = gst_bin_find_unlinked_pad(GST_BIN(pipeline), GST_PAD_SRC);
@@ -154,28 +169,39 @@ int main(int argc, char** argv) {
     gst_element_set_state(pipeline, GST_STATE_PAUSED);
 
     if (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {
-      std::cout << "Failed to PAUSE." << std::endl;
+      ROS_ERROR("Failed to PAUSE.");
       exit(-1);
     } else {
-      std::cout << "stream is PAUSED." << std::endl;
+      ROS_INFO("Stream is PAUSED.");
     }
   }
 
   // Create ROS camera interface
-  image_transport::ImageTransport it(nh);
-  image_transport::CameraPublisher pub = it.advertiseCamera("gscam/image_raw", 1);
-  ros::ServiceServer set_camera_info = nh.advertiseService("gscam/set_camera_info", setCameraInfo);
+  ros::NodeHandle nh_private = ros::NodeHandle("~");
+  image_transport::ImageTransport it(nh_private);
+  image_transport::CameraPublisher pub = it.advertiseCamera("image_raw", 1);
+  ros::ServiceServer set_camera_info = nh_private.advertiseService("set_camera_info", setCameraInfo);
 
   ROS_INFO_STREAM("Processing...");
 
   //processVideo
   rosPad = false;
   gstreamerPad = true;
-  gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  ROS_INFO("Starting stream...");
+  GstStateChangeReturn gst_ret;
+  
+  gst_ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
+  if(gst_ret != GST_STATE_CHANGE_SUCCESS) {
+    ROS_ERROR("Could not start stream!");
+    exit(-1);
+  }
+  ROS_INFO("Started stream.");
   while(nh.ok()) {
     // This should block until a new frame is awake, this way, we'll run at the 
     // actual capture framerate of the device.
+    ROS_DEBUG("Getting data...");
     GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink));
+    ROS_DEBUG("Got data.");
 
     // Stop on end of stream
     if (!buf) {
@@ -200,8 +226,8 @@ int main(int argc, char** argv) {
     sensor_msgs::Image msg;
 
     // Header information
-    msg.header.stamp = ros::Time::now();
-    msg.header.frame_id = camera_info.header.frame_id;
+    camera_info.header.stamp = ros::Time::now();
+    msg.header = camera_info.header;
 
     // Image data and metadata
     msg.width = width; 
