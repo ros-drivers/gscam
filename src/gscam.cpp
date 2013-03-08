@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
   // Sometimes setting this to true can cause a large number of frames to be
   // dropped
   bool sync_sink;
-  ros::param::get("~/sync_sink", sync_sink, true);
+  ros::param::param("~/sync_sink", sync_sink, true);
   gst_base_sink_set_sync(GST_BASE_SINK(sink), (sync_sink) ? TRUE : FALSE);
 
   if(GST_IS_PIPELINE(pipeline)) {
