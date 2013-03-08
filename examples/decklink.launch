@@ -7,8 +7,9 @@
   <arg name="MODE" default="ntsc"/>
   <arg name="CONNECTION" default="sdi"/>
   <arg name="SUBDEVICE" default="0"/>
+  <arg name="PUBLISH_FRAME" default="false"/>
 
-  <node name="decklink" pkg="gscam" type="gscam" output="screen">
+  <node ns="decklink" name="gscam_driver_decklink" pkg="gscam" type="gscam" output="screen">
     <param name="camera_parameters_file" value="$(find gscam)/examples/uncalibrated_parameters.txt"/>
     <param name="gscam_config" value="decklinksrc mode=$(arg MODE) connection=$(arg CONNECTION) subdevice=$(arg SUBDEVICE) ! ffmpegcolorspace "/>
     <param name="frame_id" value="/decklink_frame"/>

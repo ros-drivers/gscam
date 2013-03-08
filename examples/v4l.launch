@@ -1,0 +1,18 @@
+<launch>
+  <!-- This launchfile should bring up a node that broadcasts a ros image
+       transport on /webcam/image_raw -->
+
+  <arg name="DEVICE" default="/dev/video0"/>
+  <!-- The GStreamer framerate needs to be an integral fraction -->
+  <arg name="FPS" default="30/1"/>
+  <arg name="PUBLISH_FRAME" default="false"/>
+
+  <node ns="v4l" name="gscam_driver_v4l" pkg="gscam" type="gscam" output="screen">
+    <param name="camera_parameters_file" value="$(find gscam)/examples/uncalibrated_parameters.txt"/>
+    <param name="gscam_config" value="v4l2src device=$(arg DEVICE) ! video/x-raw-rgb,framerate=$(arg FPS) ! ffmpegcolorspace"/>
+    <param name="frame_id" value="/v4l_frame"/>
+    <param name="sync_sink" value="true"/>
+  </node>
+
+  <node if="$(arg PUBLISH_FRAME)" name="v4l_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /v4l_frame 10"/>
+</launch>

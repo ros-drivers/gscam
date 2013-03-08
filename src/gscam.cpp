@@ -60,8 +60,10 @@ int main(int argc, char** argv) {
     return -1;
   } else if(gsconfig_env) {
     gsconfig = gsconfig_env;
+    ROS_INFO_STREAM("Using gstreamer config: \""<<gsconfig_env<<"\"");
   } else if(gsconfig_rosparam_defined) {
     gsconfig = gsconfig_rosparam;
+    ROS_INFO_STREAM("Using gstreamer config: \""<<gsconfig_rosparam<<"\"");
   }
 
   // Initialize gstreamer pipeline
@@ -190,7 +192,7 @@ int main(int argc, char** argv) {
   GstStateChangeReturn gst_ret;
   
   gst_ret = gst_element_set_state(pipeline, GST_STATE_PLAYING);
-  if(gst_ret != GST_STATE_CHANGE_SUCCESS) {
+  if(gst_ret == GST_STATE_CHANGE_FAILURE) {
     ROS_ERROR("Could not start stream!");
     exit(-1);
   }
