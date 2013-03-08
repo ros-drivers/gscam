@@ -7,5 +7,5 @@ Examples
 --------
 
 See example launchfiles and configs in the examples directory. Currently there are examples for:
- * Standard [video4linux](http://en.wikipedia.org/wiki/Video4Linux)-based cameras like webcams
- * [BlackMagic DeckLink](http://www.blackmagicdesign.com/products/decklink/models) SDI capture cards
+ * [Video4Linux2](examples/v4l.launch): Standard [video4linux](http://en.wikipedia.org/wiki/Video4Linux)-based cameras like USB webcams
+ * [DeckLink](examples/decklink.launch): [BlackMagic](http://www.blackmagicdesign.com/products/decklink/models) DeckLink SDI capture cards
