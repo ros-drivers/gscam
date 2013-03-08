@@ -8,4 +8,4 @@ Examples
 
 See example launchfiles and configs in the examples directory. Currently there are examples for:
  * Standard [video4linux](http://en.wikipedia.org/wiki/Video4Linux)-based cameras like webcams
- * BlackMagic DeckLink SDI capture cards
+ * [BlackMagic DeckLink](http://www.blackmagicdesign.com/products/decklink/models) SDI capture cards
