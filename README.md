@@ -9,6 +9,8 @@ several fixes incorporated into it to make it broadcast correct
 `sensor_msgs/Image` messages with proper frames and timestamps. It also allows
 for more ROS-like configuration and more control over the GStreamer interface.
 
+Note that this pacakge can be built both in a rosbuild and catkin workspaces.
+
 Examples
 --------
 
