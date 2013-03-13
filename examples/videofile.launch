@@ -4,7 +4,6 @@
 
   <arg name="FILENAME"/>
   <arg name="LOOP" default="true"/>
-  <!-- The GStreamer framerate needs to be an integral fraction -->
   <arg name="PUBLISH_FRAME" default="false"/>
 
   <node ns="videofile" name="gscam_driver_v4l" pkg="gscam" type="gscam" output="screen">
