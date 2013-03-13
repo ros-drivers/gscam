@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 
+project(gscam)
+
 # 3rd-party Dependencies
 find_package(PkgConfig)
 pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
@@ -25,7 +27,6 @@ if(USE_ROSBUILD)
 
 else()
   # Use Catkin
-  project(gscam)
 
   find_package(catkin REQUIRED 
     COMPONENTS roscpp image_transport sensor_msgs camera_calibration_parsers)

@@ -33,15 +33,53 @@ GstFlowReturn gst_new_asample_cb(GstAppSink *appsink, gpointer user_data ) {
 }
 
 // Globals / camera configuration
-bool gstreamerPad, rosPad;
 int width, height;
 sensor_msgs::CameraInfo camera_info;
 std::string camera_name;
 std::string camera_parameters_file;
 
+void publish_stream(ros::NodeHandle &nh);
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "gscam_publisher");
   ros::NodeHandle nh;
+
+  bool reopen_on_eof;
+
+  while(ros::ok()) {
+    ros::param::param("~/reopen_on_eof", reopen_on_eof, false);
+
+    publish_stream(nh);
+
+    ROS_INFO("GStreamer stream stopped!");
+
+    if(reopen_on_eof) {
+      ROS_INFO("Reopening stream...");
+    } else {
+      ROS_INFO("Cleaning up stream and exiting...");
+      break;
+    }
+  }
+
+  return 0;
+}
+
+bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp) {
+
+  ROS_INFO("New camera info received");
+  camera_info = req.camera_info;
+
+  if (camera_calibration_parsers::writeCalibrationIni(camera_parameters_file, camera_name, camera_info)) {
+    ROS_INFO_STREAM("Camera calibration info written to \""<<camera_parameters_file<<"\" for camera \""<<camera_name<<"\".");
+    return true;
+  }
+  else {
+    ROS_ERROR_STREAM("Could not write \""<<camera_parameters_file<<"\"");
+    return false;
+  }
+}
+
+void publish_stream(ros::NodeHandle &nh) {
 
   // Get gstreamer configuration (either from environment variable or ROS param)
   std::string gsconfig = "";
@@ -54,10 +92,10 @@ int main(int argc, char** argv) {
 
   if (!gsconfig_env && !gsconfig_rosparam_defined) {
     ROS_FATAL( "Problem getting GSCAM_CONFIG environment variable and 'gscam_config' rosparam is not set. This is needed to set up a gstreamer pipeline." );
-    return -1;
+    exit(-1);
   } else if(gsconfig_env && gsconfig_rosparam_defined) {
     ROS_FATAL( "Both GSCAM_CONFIG environment variable and 'gscam_config' rosparam are set. Please only define one." );
-    return -1;
+    exit(-1);
   } else if(gsconfig_env) {
     gsconfig = gsconfig_env;
     ROS_INFO_STREAM("Using gstreamer config: \""<<gsconfig_env<<"\"");
@@ -74,7 +112,7 @@ int main(int argc, char** argv) {
   GstElement *pipeline = gst_parse_launch(gsconfig.c_str(),&error);
   if (pipeline == NULL) {
     ROS_FATAL_STREAM( error->message );
-    return -1;
+    exit(-1);
   }
   GstElement * sink = gst_element_factory_make("appsink",NULL);
   GstCaps * caps = gst_caps_new_simple("video/x-raw-rgb", NULL);
@@ -100,14 +138,14 @@ int main(int argc, char** argv) {
       ROS_FATAL("gst_bin_add() failed"); // TODO: do some unref
       gst_object_unref(outelement);
       gst_object_unref(pipeline);
-      return -1;
+      exit(-1);
     }
 
     if(!gst_element_link(outelement, sink)) {
       ROS_FATAL("GStreamer: cannot link outelement(\"%s\") -> sink\n", gst_element_get_name(outelement));
       gst_object_unref(outelement);
       gst_object_unref(pipeline);
-      return -1;
+      exit(-1);
     }
 
     gst_object_unref(outelement);
@@ -123,7 +161,7 @@ int main(int argc, char** argv) {
     if(!gst_element_link(launchpipe, sink)) {
       ROS_FATAL("GStreamer: cannot link launchpipe -> sink");
       gst_object_unref(pipeline);
-      return -1;
+      exit(-1);
     }
   }
 
@@ -131,7 +169,7 @@ int main(int argc, char** argv) {
 
   if (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {
     ROS_FATAL("Failed to PAUSE stream, check your gstreamer configuration.");
-    return -1;
+    exit(-1);
   } else {
     ROS_INFO_STREAM("Stream is PAUSED.");
   }
@@ -186,8 +224,6 @@ int main(int argc, char** argv) {
   ROS_INFO_STREAM("Processing...");
 
   //processVideo
-  rosPad = false;
-  gstreamerPad = true;
   ROS_INFO("Starting stream...");
   GstStateChangeReturn gst_ret;
   
@@ -197,7 +233,7 @@ int main(int argc, char** argv) {
     exit(-1);
   }
   ROS_INFO("Started stream.");
-  while(nh.ok()) {
+  while(ros::ok()) {
     // This should block until a new frame is awake, this way, we'll run at the 
     // actual capture framerate of the device.
     ROS_DEBUG("Getting data...");
@@ -206,7 +242,6 @@ int main(int argc, char** argv) {
 
     // Stop on end of stream
     if (!buf) {
-      ROS_WARN("GStreamer stream stopped! Cleaning up and exiting...");
       break;
     }
 
@@ -249,24 +284,7 @@ int main(int argc, char** argv) {
   }
 
   // Clean up
-  std::cout<<"Stopping gstreamer pipeline..."<<std::endl;
+  ROS_INFO("Stopping gstreamer pipeline...");
   gst_element_set_state(pipeline, GST_STATE_NULL);
   gst_object_unref(pipeline);
-
-  return 0;
-}
-
-bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp) {
-
-  ROS_INFO("New camera info received");
-  camera_info = req.camera_info;
-
-  if (camera_calibration_parsers::writeCalibrationIni(camera_parameters_file, camera_name, camera_info)) {
-    ROS_INFO_STREAM("Camera calibration info written to \""<<camera_parameters_file<<"\" for camera \""<<camera_name<<"\".");
-    return true;
-  }
-  else {
-    ROS_ERROR_STREAM("Could not write \""<<camera_parameters_file<<"\"");
-    return false;
-  }
 }

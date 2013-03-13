@@ -1,0 +1,19 @@
+<launch>
+  <!-- This launchfile should bring up a node that broadcasts a ros image
+       transport on /videofile/image_raw -->
+
+  <arg name="FILENAME"/>
+  <arg name="LOOP" default="true"/>
+  <!-- The GStreamer framerate needs to be an integral fraction -->
+  <arg name="PUBLISH_FRAME" default="false"/>
+
+  <node ns="videofile" name="gscam_driver_v4l" pkg="gscam" type="gscam" output="screen">
+    <param name="camera_parameters_file" value="$(find gscam)/examples/uncalibrated_parameters.txt"/>
+    <param name="gscam_config" value="filesrc location=$(arg FILENAME) ! decodebin ! ffmpegcolorspace"/>
+    <param name="frame_id" value="/videofile_frame"/>
+    <param name="sync_sink" value="true"/>
+    <param name="reopen_on_eof" value="$(arg LOOP)"/>
+  </node>
+
+  <node if="$(arg PUBLISH_FRAME)" name="videofile_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /videofile_frame 10"/>
+</launch>
