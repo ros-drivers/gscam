@@ -17,14 +17,19 @@ if(USE_ROSBUILD)
   set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
   include_directories(${GLIB_INCLUDE_DIRS} ${GST_APP_INCLUDE_DIRS})
-  rosbuild_add_executable(gscam src/gscam.cpp)
+
+  rosbuild_add_executable(gscam src/gscam.cpp src/gscam_node.cpp)
   target_link_libraries(gscam 
+    ${GSTREAMER_LIBRARIES}
+    ${GST_APP_LIBRARIES})
+
+  rosbuild_add_library(GSCamNodelet src/gscam_nodelet.cpp)
+  target_link_libraries(GSCamNodelet 
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
 
 else()
   # Use Catkin
-
   find_package(catkin REQUIRED 
     COMPONENTS roscpp image_transport sensor_msgs camera_calibration_parsers)
 
@@ -36,11 +41,18 @@ else()
     )
 
   include_directories(${catkin_INCLUDE_DIRS} ${GLIB_INCLUDE_DIRS} ${GST_APP_INCLUDE_DIRS})
+
   add_executable(gscam src/gscam.cpp)
   target_link_libraries(gscam 
+    ${catkin_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
 
+  add_library(GSCamNodelet src/gscam_nodelet.cpp)
+  target_link_libraries(GSCamNodelet 
+    ${catkin_LIBRARIES}
+    ${GSTREAMER_LIBRARIES}
+    ${GST_APP_LIBRARIES})
 
   install(TARGETS gscam
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
