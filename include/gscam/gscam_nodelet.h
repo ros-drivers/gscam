@@ -17,7 +17,7 @@ namespace gscam {
     virtual void onInit();
 
   private:
-    GSCam gscam_driver;
+    boost::scoped_ptr<GSCam> gscam_driver_;
     boost::scoped_ptr<boost::thread> stream_thread_;
   };
 }

@@ -9,7 +9,7 @@ PLUGINLIB_DECLARE_CLASS(gscam, GSCamNodelet, gscam::GSCamNodelet, nodelet::Nodel
 namespace gscam {
   GSCamNodelet::GSCamNodelet() :
     nodelet::Nodelet(),
-    gscam_driver(this->getNodeHandle(), this->getPrivateNodeHandle()),
+    gscam_driver_(NULL),
     stream_thread_(NULL)
   {
   }
@@ -21,6 +21,7 @@ namespace gscam {
 
   void GSCamNodelet::onInit()
   {
-    stream_thread_.reset(new boost::thread(boost::bind(&GSCam::run, gscam_driver)));
+    gscam_driver_.reset(new gscam::GSCam(this->getNodeHandle(), this->getPrivateNodeHandle()));
+    stream_thread_.reset(new boost::thread(boost::bind(&GSCam::run, gscam_driver_.get())));
   }
 }

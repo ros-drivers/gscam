@@ -23,7 +23,7 @@ if(USE_ROSBUILD)
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
 
-  rosbuild_add_library(GSCamNodelet src/gscam_nodelet.cpp)
+  rosbuild_add_library(GSCamNodelet src/gscam.cpp src/gscam_nodelet.cpp)
   target_link_libraries(GSCamNodelet 
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
