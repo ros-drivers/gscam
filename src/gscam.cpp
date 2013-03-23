@@ -14,6 +14,7 @@ extern "C"{
 #include <ros/ros.h>
 
 #include <image_transport/image_transport.h>
+#include <camera_info_manager/camera_info_manager.h>
 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -25,13 +26,14 @@ extern "C"{
 
 namespace gscam {
 
-  GSCam::GSCam(ros::NodeHandle nh, ros::NodeHandle nh_private) : 
+  GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) : 
     gsconfig_(""),
     pipeline_(NULL),
     sink_(NULL),
-    nh_(nh),
+    nh_(nh_camera),
     nh_private_(nh_private),
-    image_transport_(nh)
+    image_transport_(nh_camera),
+    camera_info_manager_(nh_camera)
   {
   }
 
@@ -70,33 +72,16 @@ namespace gscam {
 
     nh_private_.param("reopen_on_eof", reopen_on_eof_, false);
 
-
     // Get the camera parameters file
-    // default path is to preserve backwards-compatibilitiy
-    // TODO: switch this to use resourceretriever
-    nh_private_.param<std::string>(
-        "camera_parameters_file",
-        camera_parameters_file_,
-        "../camera_parameters.txt");
+    nh_private_.getParam("camera_info_url", camera_info_url_);
+    nh_private_.getParam("camera_name", camera_name_);
 
-    // We could probably do something with the camera name, check
-    // errors or something, but at the moment, we don't care.
-    bool calibration_loaded =
-      camera_calibration_parsers::readCalibrationIni(
-          camera_parameters_file_,
-          camera_name_,
-          camera_info_);
+    camera_info_manager_.setCameraName(camera_name_);
 
-    if (calibration_loaded) {
-      ROS_INFO_STREAM("Successfully read camera calibration from \""
-          <<camera_parameters_file_
-          <<"\" for camera \""
-          <<camera_name_
-          <<"\".  Rerun camera calibrator if it is incorrect.");
+    if(camera_info_manager_.validateURL(camera_info_url_)) {
+      camera_info_manager_.loadCameraInfo(camera_info_url_); 
     } else {
-      ROS_ERROR_STREAM("Camera parameters file \""
-          <<camera_parameters_file_
-          <<"\" not found. Use default file if no other is available.");
+      ROS_WARN_STREAM("Camera info at: "<<camera_info_url_<<" not found. Using an uncalibrated config.");
     }
 
     // Get TF Frame
@@ -190,11 +175,6 @@ namespace gscam {
 
     // Create ROS camera interface
     camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
-    ros::ServiceServer set_camera_info_servivce_ =
-      nh_.advertiseService(
-          "camera/set_camera_info",
-          &GSCam::set_camera_info_cb,
-          this);
 
     return true;
   }
@@ -262,29 +242,33 @@ namespace gscam {
       }
 
       // Construct Image message
-      sensor_msgs::Image msg;
+      sensor_msgs::ImagePtr img(new sensor_msgs::Image());
+      sensor_msgs::CameraInfoPtr cinfo;
 
       // Update header information
-      camera_info_.header.stamp = ros::Time::now();
-      camera_info_.header.frame_id = frame_id_;
-      msg.header = camera_info_.header;
+      cinfo.reset(new sensor_msgs::CameraInfo(camera_info_manager_.getCameraInfo()));
+      cinfo->header.stamp = ros::Time::now();
+      cinfo->header.frame_id = frame_id_;
+      img->header = cinfo->header;
 
       // Image data and metadata
-      msg.width = width_; 
-      msg.height = height_;
-      msg.encoding = "rgb8";
-      msg.is_bigendian = false;
-      msg.step = width_*3;
-      msg.data.resize(width_*height_*3);
+      img->width = width_; 
+      img->height = height_;
+      img->encoding = "rgb8";
+      img->is_bigendian = false;
+      img->step = width_*3;
+      img->data.resize(width_*height_*3);
 
       // Copy only the data we received
+      // Since we're publishing shared pointers, we need to copy the image so
+      // we can free the buffer allocated by gstreamer
       std::copy(
           buf->data,
           (buf->data)+(buf->size),
-          msg.data.begin());
+          img->data.begin());
 
       // Publish the image/info
-      camera_pub_.publish(msg, camera_info_);
+      camera_pub_.publish(img, cinfo);
 
       // Release the buffer
       gst_buffer_unref(buf);
@@ -302,21 +286,6 @@ namespace gscam {
       gst_object_unref(pipeline_);
       pipeline_ = NULL;
     }
-  }
-
-  bool GSCam::set_camera_info_cb(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp)
-  {
-    ROS_DEBUG("New camera info received.");
-    camera_info_ = req.camera_info;
-
-    if (camera_calibration_parsers::writeCalibrationIni(camera_parameters_file_, camera_name_, camera_info_)) {
-      ROS_INFO_STREAM("Camera calibration info written to \""<<camera_parameters_file_<<"\" for camera \""<<camera_name_<<"\".");
-    }  else {
-      ROS_ERROR_STREAM("Could not write \""<<camera_parameters_file_<<"\"");
-      return false;
-    }
-
-    return true;
   }
 
   void GSCam::run() {

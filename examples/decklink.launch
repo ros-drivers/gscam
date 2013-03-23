@@ -9,8 +9,9 @@
   <arg name="SUBDEVICE" default="0"/>
   <arg name="PUBLISH_FRAME" default="false"/>
 
-  <node ns="decklink" name="gscam_driver_decklink" pkg="gscam" type="gscam" output="screen">
-    <param name="camera_parameters_file" value="$(find gscam)/examples/uncalibrated_parameters.txt"/>
+  <node ns="decklink" name="gscam_driver_decklink" pkg="gscam" type="gscam_node" output="screen">
+    <param name="camera_name" value="default"/>
+    <param name="camera_info_url" value="package://gscam/examples/uncalibrated_parameters.ini"/>
     <param name="gscam_config" value="decklinksrc mode=$(arg MODE) connection=$(arg CONNECTION) subdevice=$(arg SUBDEVICE) ! ffmpegcolorspace "/>
     <param name="frame_id" value="/decklink_frame"/>
     <!-- This needs to be set to false to avoid dropping tons of frames -->

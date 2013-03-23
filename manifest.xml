@@ -13,6 +13,7 @@ A ROS camera driver that uses gstreamer to connect to devices such as webcams.
   <depend package="image_transport"/>
   <depend package="sensor_msgs"/>
   <depend package="camera_calibration_parsers" />
+  <depend package="camera_info_manager" />
   <depend package="nodelet" />
 
   <export>

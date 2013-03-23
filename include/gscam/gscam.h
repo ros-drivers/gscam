@@ -9,6 +9,7 @@ extern "C"{
 #include <ros/ros.h>
 
 #include <image_transport/image_transport.h>
+#include <camera_info_manager/camera_info_manager.h>
 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
@@ -20,7 +21,7 @@ namespace gscam {
 
   class GSCam {
   public:
-    GSCam(ros::NodeHandle nh, ros::NodeHandle nh_private);
+    GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private);
     ~GSCam();
 
     bool configure();
@@ -31,10 +32,6 @@ namespace gscam {
     void run();
 
   private:
-    bool set_camera_info_cb(
-        sensor_msgs::SetCameraInfo::Request &req,
-        sensor_msgs::SetCameraInfo::Response &rsp);
-
     // General gstreamer configuration
     std::string gsconfig_;
 
@@ -50,15 +47,14 @@ namespace gscam {
     // Camera publisher configuration
     std::string frame_id_;
     int width_, height_;
-    sensor_msgs::CameraInfo camera_info_;
     std::string camera_name_;
-    std::string camera_parameters_file_;
+    std::string camera_info_url_;
 
     // ROS Inteface
     ros::NodeHandle nh_, nh_private_;
     image_transport::ImageTransport image_transport_;
+    camera_info_manager::CameraInfoManager camera_info_manager_;
     image_transport::CameraPublisher camera_pub_;
-    ros::ServiceServer set_camera_info_servivce_;
   };
 
 }
