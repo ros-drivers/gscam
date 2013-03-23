@@ -25,7 +25,8 @@ This can be run as both a node and a nodelet.
  * `camera/set_camera_info`
 
 #### Parameters
- * `~camera_parameters_file`: A url (`file://path/to/file`, `package://pkg_name/path/to/file`) to the [camera calibration file](http://www.ros.org/wiki/camera_calibration_parsers#File_formats).
+ * `~camera_name`: The name of the camera (corrsponding to the camera info)
+ * `~camera_info_url`: A url (`file://path/to/file`, `package://pkg_name/path/to/file`) to the [camera calibration file](http://www.ros.org/wiki/camera_calibration_parsers#File_formats).
  * `~gscam_config`: The GStreamer [configuration string](http://wiki.oz9aec.net/index.php?title=Gstreamer_cheat_sheet&oldid=1829).
  * `~frame_id`: The [TF](http://www.ros.org/wiki/tf) frame ID.
  * `~reopen_on_eof`: Re-open the stream if it ends (EOF).
