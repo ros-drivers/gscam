@@ -80,6 +80,7 @@ namespace gscam {
 
     if(camera_info_manager_.validateURL(camera_info_url_)) {
       camera_info_manager_.loadCameraInfo(camera_info_url_); 
+      ROS_INFO_STREAM("Loaded camera calibration from "<<camera_info_url_);
     } else {
       ROS_WARN_STREAM("Camera info at: "<<camera_info_url_<<" not found. Using an uncalibrated config.");
     }
@@ -218,6 +219,15 @@ namespace gscam {
       // actual capture framerate of the device.
       ROS_DEBUG("Getting data...");
       GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink_));
+
+
+      GstFormat fmt = GST_FORMAT_TIME;
+      gint64 current = -1;
+
+      // Query the current position of the stream
+      //if (gst_element_query_position(pipeline_, &fmt, &current)) {
+        //ROS_INFO_STREAM("Position "<<current);
+      //}
 
       // Stop on end of stream
       if (!buf) {
