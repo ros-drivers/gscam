@@ -33,25 +33,34 @@ if(USE_ROSBUILD)
 else()
   # Use Catkin
   find_package(catkin REQUIRED 
-    COMPONENTS roscpp image_transport sensor_msgs camera_calibration_parsers)
-
-  catkin_package(
-    #INCLUDE_DIRS include
-    #LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS roscpp image_transport sensor_msgs camera_calibration_parsers
-    DEPENDS opencv2
+    COMPONENTS roscpp image_transport sensor_msgs
+    camera_calibration_parsers camera_info_manager
     )
 
-  include_directories(${catkin_INCLUDE_DIRS} ${GLIB_INCLUDE_DIRS} ${GST_APP_INCLUDE_DIRS})
+  catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES gscam
+    CATKIN_DEPENDS roscpp image_transport sensor_msgs
+    camera_calibration_parsers camera_info_manager
+    #DEPENDS opencv2
+    )
 
-  add_executable(gscam src/gscam.cpp)
-  target_link_libraries(gscam 
+  include_directories(
+    include
+    ${catkin_INCLUDE_DIRS}
+    ${GLIB_INCLUDE_DIRS}
+    ${GST_APP_INCLUDE_DIRS})
+
+  add_library(gscam src/gscam.cpp)
+
+  add_executable(gscam_node src/gscam_node.cpp)
+  target_link_libraries(gscam_node gscam
     ${catkin_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
 
   add_library(GSCamNodelet src/gscam_nodelet.cpp)
-  target_link_libraries(GSCamNodelet 
+  target_link_libraries(GSCamNodelet gscam
     ${catkin_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})

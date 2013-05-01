@@ -1,0 +1,34 @@
+<package>
+  <name>gscam</name>
+  <version>0.1.0</version>
+  <description>
+    A ROS camera driver that uses gstreamer to connect to
+    devices such as webcams.
+  </description>
+  <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
+  <license>BSD</license>
+
+  <author email="tjay@cs.brown.edu">Graylin Trevor Jay</author>
+  <author email="chriscrick@cs.brown.edu">Christopher Crick</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>libgstreamer0.10-dev</build_depend>
+  <build_depend>libgstreamer-plugins-base0.10-dev</build_depend>
+
+  <build_depend>opencv2</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>camera_calibration_parsers</build_depend>
+  <build_depend>camera_info_manager</build_depend>
+
+  <run_depend>opencv2</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>image_transport</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>camera_calibration_parsers</run_depend>
+  <run_depend>camera_info_manager</run_depend>
+
+</package>
+
