@@ -17,6 +17,10 @@ ROS API
 ### gscam
 
 This can be run as both a node and a nodelet.
+
+#### Nodes
+ * `gscam`
+
 #### Topics
  * `camera/image_raw`
  * `camera/camera_info`

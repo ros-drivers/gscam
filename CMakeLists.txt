@@ -24,6 +24,7 @@ if(USE_ROSBUILD)
   target_link_libraries(gscam_node gscam
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
+  set_target_properties(gscam_node PROPERTIES OUTPUT_NAME gscam)
 
   rosbuild_add_library(GSCamNodelet src/gscam_nodelet.cpp)
   target_link_libraries(GSCamNodelet gscam
@@ -58,6 +59,7 @@ else()
     ${catkin_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
+  set_target_properties(gscam_node PROPERTIES OUTPUT_NAME gscam)
 
   add_library(GSCamNodelet src/gscam_nodelet.cpp)
   target_link_libraries(GSCamNodelet gscam
@@ -65,11 +67,25 @@ else()
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
 
-  install(TARGETS gscam
+  install(TARGETS gscam gscam_node GSCamNodelet
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
 
+
+  # Interim compatibility
+  # Remove this in the next release
+  install(FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+  set(EXECUTABLE_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME})
 endif()
+
+# Interim compatibility
+# Remove this in the next release
+configure_file(scripts/gscam_node.in ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node)
+file(COPY ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node 
+  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
+  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
 
