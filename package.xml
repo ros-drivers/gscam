@@ -6,8 +6,10 @@
     devices such as webcams.
   </description>
   <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
+  <maintainer email="rctoris@wpi.edu">Russell Toris</maintainer>
   <license>BSD</license>
 
+  <author email="jbo@jhu.edu">Jonathan Bohren</author>
   <author email="tjay@cs.brown.edu">Graylin Trevor Jay</author>
   <author email="chriscrick@cs.brown.edu">Christopher Crick</author>
 
