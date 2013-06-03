@@ -19,6 +19,7 @@ extern "C"{
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
+#include <sensor_msgs/image_encodings.h>
 
 #include <camera_calibration_parsers/parse_ini.h>
 
@@ -26,14 +27,15 @@ extern "C"{
 
 namespace gscam {
 
-  GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) : 
+  GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) :
     gsconfig_(""),
     pipeline_(NULL),
     sink_(NULL),
     nh_(nh_camera),
     nh_private_(nh_private),
     image_transport_(nh_camera),
-    camera_info_manager_(nh_camera)
+    camera_info_manager_(nh_camera),
+    image_encoding_(sensor_msgs::image_encodings::RGB8)
   {
   }
 
@@ -76,10 +78,17 @@ namespace gscam {
     nh_private_.getParam("camera_info_url", camera_info_url_);
     nh_private_.getParam("camera_name", camera_name_);
 
+    // Get the image encoding
+    nh_private_.getParam("image_encoding", image_encoding_);
+    if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
+        image_encoding_ != sensor_msgs::image_encodings::MONO8) {
+      ROS_FATAL_STREAM("Unsupported image encoding: " + image_encoding_);
+    }
+
     camera_info_manager_.setCameraName(camera_name_);
 
     if(camera_info_manager_.validateURL(camera_info_url_)) {
-      camera_info_manager_.loadCameraInfo(camera_info_url_); 
+      camera_info_manager_.loadCameraInfo(camera_info_url_);
       ROS_INFO_STREAM("Loaded camera calibration from "<<camera_info_url_);
     } else {
       ROS_WARN_STREAM("Camera info at: "<<camera_info_url_<<" not found. Using an uncalibrated config.");
@@ -115,7 +124,9 @@ namespace gscam {
 
     // Create RGB sink
     sink_ = gst_element_factory_make("appsink",NULL);
-    GstCaps * caps = gst_caps_new_simple("video/x-raw-rgb", NULL);
+    GstCaps * caps = image_encoding_ == sensor_msgs::image_encodings::RGB8 ?
+        gst_caps_new_simple("video/x-raw-rgb", NULL) :
+        gst_caps_new_simple("video/x-raw-gray", NULL);
     gst_app_sink_set_caps(GST_APP_SINK(sink_), caps);
     gst_caps_unref(caps);
 
@@ -123,7 +134,7 @@ namespace gscam {
     // Sometimes setting this to true can cause a large number of frames to be
     // dropped
     gst_base_sink_set_sync(
-        GST_BASE_SINK(sink_), 
+        GST_BASE_SINK(sink_),
         (sync_sink_) ? TRUE : FALSE);
 
     if(GST_IS_PIPELINE(pipeline_)) {
@@ -180,7 +191,7 @@ namespace gscam {
     return true;
   }
 
-  void GSCam::publish_stream() 
+  void GSCam::publish_stream()
   {
     ROS_INFO_STREAM("Publishing stream...");
 
@@ -215,7 +226,7 @@ namespace gscam {
 
     // Poll the data as fast a spossible
     while(ros::ok()) {
-      // This should block until a new frame is awake, this way, we'll run at the 
+      // This should block until a new frame is awake, this way, we'll run at the
       // actual capture framerate of the device.
       ROS_DEBUG("Getting data...");
       GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink_));
@@ -245,10 +256,15 @@ namespace gscam {
       gst_structure_get_int(structure,"height",&height_);
 
       // Complain if the returned buffer is smaller than we expect
-      if (buf->size < unsigned(width_ * height_ * 3)) {
+      const unsigned int expected_frame_size =
+          image_encoding_ == sensor_msgs::image_encodings::RGB8
+              ? width_ * height_ * 3
+              : width_ * height_;
+
+      if (buf->size < expected_frame_size) {
         ROS_WARN_STREAM( "GStreamer image buffer underflow: Expected frame to be "
-            << (width_ * height_ * 3) << " bytes but got only "
-            << (buf->size) << " bytes. (make sure frames are raw RGB encoded)");
+            << expected_frame_size << " bytes but got only "
+            << (buf->size) << " bytes. (make sure frames are correctly encoded)");
       }
 
       // Construct Image message
@@ -262,16 +278,20 @@ namespace gscam {
       img->header = cinfo->header;
 
       // Image data and metadata
-      img->width = width_; 
+      img->width = width_;
       img->height = height_;
-      img->encoding = "rgb8";
+      img->encoding = image_encoding_;
       img->is_bigendian = false;
-      img->step = width_*3;
-      img->data.resize(width_*height_*3);
+      img->data.resize(expected_frame_size);
 
       // Copy only the data we received
       // Since we're publishing shared pointers, we need to copy the image so
       // we can free the buffer allocated by gstreamer
+      if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {
+        img->step = width_ * 3;
+      } else {
+        img->step = width_;
+      }
       std::copy(
           buf->data,
           (buf->data)+(buf->size),
