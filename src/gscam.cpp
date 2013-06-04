@@ -16,6 +16,7 @@ extern "C"{
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
@@ -34,8 +35,7 @@ namespace gscam {
     nh_(nh_camera),
     nh_private_(nh_private),
     image_transport_(nh_camera),
-    camera_info_manager_(nh_camera),
-    image_encoding_(sensor_msgs::image_encodings::RGB8)
+    camera_info_manager_(nh_camera)
   {
   }
 
@@ -79,7 +79,7 @@ namespace gscam {
     nh_private_.getParam("camera_name", camera_name_);
 
     // Get the image encoding
-    nh_private_.getParam("image_encoding", image_encoding_);
+    nh_private_.param("image_encoding", image_encoding_, sensor_msgs::image_encodings::RGB8);
     if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
         image_encoding_ != sensor_msgs::image_encodings::MONO8) {
       ROS_FATAL_STREAM("Unsupported image encoding: " + image_encoding_);
