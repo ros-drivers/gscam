@@ -47,6 +47,7 @@ namespace gscam {
     // Camera publisher configuration
     std::string frame_id_;
     int width_, height_;
+    std::string image_encoding_;
     std::string camera_name_;
     std::string camera_info_url_;
 
