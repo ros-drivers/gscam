@@ -33,6 +33,11 @@
   <run_depend>sensor_msgs</run_depend>
   <run_depend>camera_calibration_parsers</run_depend>
   <run_depend>camera_info_manager</run_depend>
+  
+  <export>
+      <nodelet plugin="${prefix}/nodelet_plugins.xml"/>
+  </export>
+
 
 </package>
 
