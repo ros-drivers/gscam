@@ -12,7 +12,6 @@
     args="load gscam/GSCamNodelet standalone_nodelet" 
     output="screen">
     <param name="camera_name" value="default"/>
-    <param name="camera_name" value="default"/>
     <param name="camera_info_url" value="package://gscam/examples/uncalibrated_parameters.ini"/>
     <param name="gscam_config" value="v4l2src device=$(arg DEVICE) ! video/x-raw-rgb,framerate=$(arg FPS) ! ffmpegcolorspace"/>
     <param name="frame_id" value="/v4l_frame"/>
