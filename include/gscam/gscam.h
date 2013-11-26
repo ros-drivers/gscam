@@ -56,6 +56,9 @@ namespace gscam {
     image_transport::ImageTransport image_transport_;
     camera_info_manager::CameraInfoManager camera_info_manager_;
     image_transport::CameraPublisher camera_pub_;
+    // Case of a jpeg only publisher
+    ros::Publisher jpeg_pub_;
+    ros::Publisher cinfo_pub_;
   };
 
 }
