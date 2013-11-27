@@ -72,6 +72,7 @@ namespace gscam {
     // Get additional gscam configuration
     nh_private_.param("sync_sink", sync_sink_, true);
     nh_private_.param("preroll", preroll_, false);
+    nh_private_.param("use_gst_timestamps", use_gst_timestamps_, false);
 
     nh_private_.param("reopen_on_eof", reopen_on_eof_, false);
 
@@ -183,6 +184,14 @@ namespace gscam {
       }
     }
 
+    // Calibration between ros::Time and gst timestamps
+    GstClock * clock = gst_system_clock_obtain();
+    ros::Time now = ros::Time::now();
+    GstClockTime ct = gst_clock_get_time(clock);
+    gst_object_unref(clock);
+    time_offset_ = now.toSec() - GST_TIME_AS_USECONDS(ct)/1e6;
+    ROS_INFO("Time offset: %.3f",time_offset_);
+
     gst_element_set_state(pipeline_, GST_STATE_PAUSED);
 
     if (gst_element_get_state(pipeline_, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {
@@ -240,17 +249,22 @@ namespace gscam {
     while(ros::ok()) {
       // This should block until a new frame is awake, this way, we'll run at the
       // actual capture framerate of the device.
-      ROS_DEBUG("Getting data...");
+      // ROS_DEBUG("Getting data...");
       GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink_));
+      GstClockTime bt = gst_element_get_base_time(pipeline_);
+      // ROS_INFO("New buffer: timestamp %.6f %lu %lu %.3f",
+      //         GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_, buf->timestamp, bt, time_offset_);
 
 
+#if 0
       GstFormat fmt = GST_FORMAT_TIME;
       gint64 current = -1;
 
-      // Query the current position of the stream
-      //if (gst_element_query_position(pipeline_, &fmt, &current)) {
-        //ROS_INFO_STREAM("Position "<<current);
-      //}
+       Query the current position of the stream
+      if (gst_element_query_position(pipeline_, &fmt, &current)) {
+          ROS_INFO_STREAM("Position "<<current);
+      }
+#endif
 
       // Stop on end of stream
       if (!buf) {
@@ -258,7 +272,7 @@ namespace gscam {
         break;
       }
 
-      ROS_DEBUG("Got data.");
+      // ROS_DEBUG("Got data.");
 
       // Get the image width and height
       GstPad* pad = gst_element_get_static_pad(sink_, "sink");
@@ -270,7 +284,12 @@ namespace gscam {
       // Update header information
       sensor_msgs::CameraInfoPtr cinfo;
       cinfo.reset(new sensor_msgs::CameraInfo(camera_info_manager_.getCameraInfo()));
-      cinfo->header.stamp = ros::Time::now();
+      if (use_gst_timestamps_) {
+          cinfo->header.stamp = ros::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_);
+      } else {
+          cinfo->header.stamp = ros::Time::now();
+      }
+      // ROS_INFO("Image time stamp: %.3f",cinfo->header.stamp.toSec());
       cinfo->header.frame_id = frame_id_;
       if (image_encoding_ == "jpeg") {
           sensor_msgs::CompressedImagePtr img(new sensor_msgs::CompressedImage());

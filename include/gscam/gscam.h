@@ -43,6 +43,7 @@ namespace gscam {
     bool sync_sink_;
     bool preroll_;
     bool reopen_on_eof_;
+    bool use_gst_timestamps_;
 
     // Camera publisher configuration
     std::string frame_id_;
@@ -52,6 +53,8 @@ namespace gscam {
     std::string camera_info_url_;
 
     // ROS Inteface
+    // Calibration between ros::Time and gst timestamps
+    double time_offset_;
     ros::NodeHandle nh_, nh_private_;
     image_transport::ImageTransport image_transport_;
     camera_info_manager::CameraInfoManager camera_info_manager_;
