@@ -1,0 +1,20 @@
+<launch>
+  <!-- This launchfile should bring up a node that broadcasts a ros image
+       transport on /webcam/image_raw -->
+
+  <arg name="DEVICE" default="/dev/video0"/>
+  <!-- The GStreamer framerate needs to be an integral fraction -->
+  <arg name="FPS" default="30/1"/>
+  <arg name="PUBLISH_FRAME" default="false"/>
+
+  <node ns="v4l" name="gscam_driver_v4l" pkg="gscam" type="gscam" output="screen">
+    <param name="camera_name" value="default"/>
+    <param name="camera_info_url" value="package://gscam/examples/uncalibrated_parameters.ini"/>
+    <param name="gscam_config" value="v4l2src do-timestamp=true is-live=true ! video/x-raw-yuv ! jpegenc ! multipartmux ! multipartdemux ! jpegparse"/>
+    <param name="use_gst_timestamps" value="true"/>
+    <param name="image_encoding" value="jpeg"/>
+    <param name="frame_id" value="/v4l_frame"/>
+    <param name="sync_sink" value="true"/>
+  </node>
+
+</launch>
