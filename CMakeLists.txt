@@ -67,23 +67,28 @@ else()
     ${GSTREAMER_LIBRARIES}
     ${GST_APP_LIBRARIES})
 
+  # Install directives
+
   install(TARGETS gscam gscam_node GSCamNodelet
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
 
-   install(FILES nodelet_plugins.xml
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-        )
+  install(DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    PATTERN ".svn" EXCLUDE)
 
-   install(FILES
+  install(FILES nodelet_plugins.xml
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    )
+
+  install(FILES
     examples/v4l.launch
     examples/gscam_nodelet.launch
     examples/nodelet_pipeline.launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
     )
-
 
   # Interim compatibility
   # Remove this in the next release
@@ -93,7 +98,7 @@ else()
 endif()
 
 # Interim compatibility
-# Remove this in the next release
+# Remove this in the next distribution release
 configure_file(scripts/gscam_node.in ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node)
 file(COPY ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node 
   DESTINATION ${EXECUTABLE_OUTPUT_PATH}
