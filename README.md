@@ -11,8 +11,8 @@ for more ROS-like configuration and more control over the GStreamer interface.
 
 Note that this pacakge can be built both in a rosbuild and catkin workspaces.
 
-ROS API
--------
+ROS API (stable)
+----------------
 
 ### gscam
 
@@ -35,6 +35,11 @@ This can be run as both a node and a nodelet.
  * `~frame_id`: The [TF](http://www.ros.org/wiki/tf) frame ID.
  * `~reopen_on_eof`: Re-open the stream if it ends (EOF).
  * `~sync_sink`: Synchronize the app sink (sometimes setting this to `false` can resolve problems with sub-par framerates).
+
+C++ API (unstable)
+------------------
+
+The gscam c++ library can be used, but it is not guaranteed to be stable. 
 
 Examples
 --------
