@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.3 (2013-12-19)
+------------------
 * Removed special characters from changelog.
 
 0.1.2 (2013-12-19)
