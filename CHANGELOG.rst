@@ -17,7 +17,7 @@ Changelog for package gscam
 * Remove unused ``bpp_`` member.
 * Expose default settings for ``image_encodings`` to the ros master.
 * Add in support for mono cameras.
-* Contributors: Cedric Pradalier, Holger Rapp, Jonathan Bohren, Russell Toris, Séverin Lemaignan
+* Contributors: Cedric Pradalier, Holger Rapp, Jonathan Bohren, Russell Toris, Severin Lemaignan
 
 0.1.1 (2013-05-30)
 ------------------
