@@ -2,6 +2,10 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed special characters from changelog.
+
 0.1.2 (2013-12-19)
 ------------------
 * Added install targets for headers
