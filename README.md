@@ -48,4 +48,4 @@ are examples for:
  * [Video File](examples/videofile.launch): Any videofile readable by GStreamer
  * [DeckLink](examples/decklink.launch):
    [BlackMagic](http://www.blackmagicdesign.com/products/decklink/models)
-   DeckLink SDI capture cards
+   DeckLink SDI capture cards (note: this requires the `gst-plugins-bad` plugins)
