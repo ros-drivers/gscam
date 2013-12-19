@@ -73,6 +73,17 @@ else()
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     )
 
+   install(FILES nodelet_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
+
+   install(FILES
+    examples/v4l.launch
+    examples/gscam_nodelet.launch
+    examples/nodelet_pipeline.launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    )
+
 
   # Interim compatibility
   # Remove this in the next release

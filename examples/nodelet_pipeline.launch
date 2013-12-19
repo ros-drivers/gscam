@@ -1,0 +1,41 @@
+<!-- -*- mode: XML -*- -->
+
+<!-- Load Bayer color correction and recification into camera nodelet
+        manager process.
+
+     this is a test script: NOT FOR GENERAL USE
+
+-->
+
+<launch>
+
+  <!-- start the driver in a camera_nodelet_manager process -->
+  <include file="$(find gscam)/gscam_nodelet.launch" >
+  </include>
+
+  <!-- Bayer color decoding -->
+  <node pkg="nodelet" type="nodelet" name="image_proc_debayer"
+	args="load image_proc/debayer camera_nodelet_manager">
+    <remap from="camera_info" to="camera/camera_info" />
+    <remap from="image_color" to="camera/image_color" />
+    <remap from="image_mono" to="camera/image_mono" />
+    <remap from="image_raw" to="camera/image_raw" />
+  </node>
+
+  <!-- mono rectification -->
+  <node pkg="nodelet" type="nodelet" name="image_proc_rect"
+	args="load image_proc/rectify camera_nodelet_manager">
+    <remap from="camera_info" to="camera/camera_info" />
+    <remap from="image_mono" to="camera/image_mono" />
+    <remap from="image_rect" to="camera/image_rect" />
+  </node>
+
+  <!-- color rectification -->
+  <node pkg="nodelet" type="nodelet" name="image_proc_rect_color"
+	args="load image_proc/rectify camera_nodelet_manager">
+    <remap from="camera_info" to="camera/camera_info" />
+    <remap from="image_mono" to="camera/image_color" />
+    <remap from="image_rect" to="camera/image_rect_color" />
+  </node>
+
+</launch>
