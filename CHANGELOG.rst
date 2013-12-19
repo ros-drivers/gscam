@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2013-12-19)
+------------------
 * Added install targets for headers
 * Adding note on blackmagic decklink cards
 * Make sure nodelets are usable
