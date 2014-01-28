@@ -34,5 +34,6 @@
     </node>
   </group>
 
-  <node if="$(arg PUBLISH_FRAME)" name="v4l_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /v4l_frame 10"/>
+  <node if="$(arg PUBLISH_FRAME)" name="left_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /minoru_left 10"/>
+  <node if="$(arg PUBLISH_FRAME)" name="right_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /minoru_right 10"/>
 </launch>
