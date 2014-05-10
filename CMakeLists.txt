@@ -43,7 +43,7 @@ else()
     LIBRARIES gscam
     CATKIN_DEPENDS roscpp nodelet image_transport sensor_msgs
     camera_calibration_parsers camera_info_manager
-    #DEPENDS opencv2
+    DEPENDS GSTREAMER GST_APP
     )
 
   include_directories(
