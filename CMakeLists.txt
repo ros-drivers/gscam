@@ -19,6 +19,9 @@ if(USE_ROSBUILD)
   include_directories(${GLIB_INCLUDE_DIRS} ${GST_APP_INCLUDE_DIRS})
 
   rosbuild_add_library(gscam src/gscam.cpp)
+  target_link_libraries(gscam
+    ${GSTREAMER_LIBRARIES}
+    ${GST_APP_LIBRARIES})
 
   rosbuild_add_executable(gscam_node src/gscam_node.cpp)
   target_link_libraries(gscam_node gscam
@@ -53,6 +56,10 @@ else()
     ${GST_APP_INCLUDE_DIRS})
 
   add_library(gscam src/gscam.cpp)
+  target_link_libraries(gscam
+    ${catkin_LIBRARIES}
+    ${GSTREAMER_LIBRARIES}
+    ${GST_APP_LIBRARIES})
 
   add_executable(gscam_node src/gscam_node.cpp)
   target_link_libraries(gscam_node gscam
