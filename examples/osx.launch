@@ -1,0 +1,20 @@
+<launch>
+  <!-- This launchfile should bring up a node that broadcasts a ros image
+       transport on /webcam/image_raw -->
+
+  <!-- The GStreamer device-index needs to be an integer -->
+  <arg name="DEVICE_INDEX" default="0"/>
+  <!-- The GStreamer framerate needs to be an integral fraction -->
+  <arg name="FPS" default="30/1"/>
+  <arg name="PUBLISH_FRAME" default="false"/>
+
+  <node ns="qtkit" name="gscam_driver_qtkit" pkg="gscam" type="gscam" output="screen">
+    <param name="camera_name" value="default"/>
+    <param name="camera_info_url" value="package://gscam/examples/uncalibrated_parameters.ini"/>
+    <param name="gscam_config" value="qtkitvideosrc device-index=$(arg DEVICE_INDEX) ! video/x-raw-yuv,framerate=$(arg FPS) ! ffmpegcolorspace"/>
+    <param name="frame_id" value="/qtkit_frame"/>
+    <param name="sync_sink" value="true"/>
+  </node>
+
+  <node if="$(arg PUBLISH_FRAME)" name="qtkit_transform" pkg="tf" type="static_transform_publisher" args="1 2 3 0 -3.141 0 /world /qtkit_frame 10"/>
+</launch>
