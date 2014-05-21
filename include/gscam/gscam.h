@@ -62,6 +62,12 @@ namespace gscam {
     // Case of a jpeg only publisher
     ros::Publisher jpeg_pub_;
     ros::Publisher cinfo_pub_;
+
+    // Deprecated publishers
+    image_transport::ImageTransport image_transport_deprecated_;
+    image_transport::CameraPublisher camera_pub_deprecated_;
+    ros::Publisher jpeg_pub_deprecated_;
+    ros::Publisher cinfo_pub_deprecated_;
   };
 
 }
