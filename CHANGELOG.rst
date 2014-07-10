@@ -2,6 +2,10 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+FORTHCOMING
+-----------
+* Added experimental GStreamer-1.0 branch support
+
 0.1.3 (2013-12-19)
 ------------------
 * Removed special characters from changelog.

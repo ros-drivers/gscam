@@ -4,8 +4,16 @@ project(gscam)
 
 # System Dependencies
 find_package(PkgConfig)
-pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
-pkg_check_modules(GST_APP REQUIRED gstreamer-app-0.10)
+
+if(GSTREAMER_VERSION_1_x)
+  message(STATUS "gst 1.0")
+  pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+  pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
+else()
+  message(STATUS "gst 0.1")
+  pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
+  pkg_check_modules(GST_APP REQUIRED gstreamer-app-0.10)
+endif()
 
 if(USE_ROSBUILD)
   # Use rosbuild
