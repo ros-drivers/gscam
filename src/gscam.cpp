@@ -283,7 +283,7 @@ namespace gscam {
       guint8* &buf_data = info.data;
 #else
       GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink_));
-      gsize &buf_size = buf->size;
+      guint &buf_size = buf->size;
       guint8* &buf_data = buf->data;
 #endif
       GstClockTime bt = gst_element_get_base_time(pipeline_);
@@ -311,7 +311,11 @@ namespace gscam {
 
       // Get the image width and height
       GstPad* pad = gst_element_get_static_pad(sink_, "sink");
+#if (GST_VERSION_MAJOR == 1)
       const GstCaps *caps = gst_pad_get_current_caps(pad);
+#else
+      const GstCaps *caps = gst_pad_get_negotiated_caps(pad);
+#endif
       GstStructure *structure = gst_caps_get_structure(caps,0);
       gst_structure_get_int(structure,"width",&width_);
       gst_structure_get_int(structure,"height",&height_);
@@ -321,7 +325,11 @@ namespace gscam {
       sensor_msgs::CameraInfoPtr cinfo;
       cinfo.reset(new sensor_msgs::CameraInfo(cur_cinfo));
       if (use_gst_timestamps_) {
+#if (GST_VERSION_MAJOR == 1)
           cinfo->header.stamp = ros::Time(GST_TIME_AS_USECONDS(buf->pts+bt)/1e6+time_offset_);
+#else
+          cinfo->header.stamp = ros::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_);
+#endif
       } else {
           cinfo->header.stamp = ros::Time::now();
       }
