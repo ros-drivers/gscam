@@ -36,8 +36,13 @@ namespace gscam {
     nh_(nh_camera),
     nh_private_(nh_private),
     image_transport_(nh_camera),
-    camera_info_manager_(nh_camera)
+    camera_info_manager_(nh_camera),
+    run_pipeline_(true),
+    reconfigure_(false)
   {
+    start_service_ = nh_private.advertiseService("start_pipeline", &GSCam::start_pipeline_cb, this);
+    stop_service_ = nh_private.advertiseService("stop_pipeline", &GSCam::stop_pipeline_cb, this);
+    reconfigure_service_ = nh_private.advertiseService("reconfigure_pipeline", &GSCam::reconfigure_pipeline_cb, this);
   }
 
   GSCam::~GSCam()
@@ -70,6 +75,7 @@ namespace gscam {
     }
 
     // Get additional gscam configuration
+    nh_private_.param("auto_start", run_pipeline_, true);
     nh_private_.param("sync_sink", sync_sink_, true);
     nh_private_.param("preroll", preroll_, false);
     nh_private_.param("use_gst_timestamps", use_gst_timestamps_, false);
@@ -88,13 +94,17 @@ namespace gscam {
       ROS_FATAL_STREAM("Unsupported image encoding: " + image_encoding_);
     }
 
-    camera_info_manager_.setCameraName(camera_name_);
+    if(!camera_info_manager_.isCalibrated()) {
+      camera_info_manager_.setCameraName(camera_name_);
 
-    if(camera_info_manager_.validateURL(camera_info_url_)) {
-      camera_info_manager_.loadCameraInfo(camera_info_url_);
-      ROS_INFO_STREAM("Loaded camera calibration from "<<camera_info_url_);
+      if(camera_info_manager_.validateURL(camera_info_url_)) {
+        camera_info_manager_.loadCameraInfo(camera_info_url_);
+        ROS_INFO_STREAM("Loaded camera calibration from "<<camera_info_url_);
+      } else {
+        ROS_WARN_STREAM("Camera info at: "<<camera_info_url_<<" not found. Using an uncalibrated config.");
+      }
     } else {
-      ROS_WARN_STREAM("Camera info at: "<<camera_info_url_<<" not found. Using an uncalibrated config.");
+      ROS_INFO_STREAM("Camera is already calibrated. Not re-loading camera info.");
     }
 
     // Get TF Frame
@@ -220,10 +230,13 @@ namespace gscam {
 
     // Create ROS camera interface
     if (image_encoding_ == "jpeg") {
-        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1);
-        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1);
+      jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1);
+      cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1);
     } else {
+      if(camera_pub_.getTopic() == "") {
+        ROS_INFO_STREAM("topic: " << camera_pub_.getTopic());
         camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+      }
     }
 
     return true;
@@ -263,7 +276,7 @@ namespace gscam {
     ROS_INFO("Started stream.");
 
     // Poll the data as fast a spossible
-    while(ros::ok()) 
+    while(ros::ok() && run_pipeline_) 
     {
       // This should block until a new frame is awake, this way, we'll run at the
       // actual capture framerate of the device.
@@ -410,8 +423,22 @@ namespace gscam {
     }
   }
 
-  void GSCam::run() {
+  void GSCam::run() 
+  {
     while(ros::ok()) {
+      // Check for reconfigure flag
+      if(reconfigure_) {
+        run_pipeline_ = true;
+        ROS_INFO("Reconfiguring pipeline...");
+      }
+      // Sleep while the pipeline isn't running
+      if(!run_pipeline_) {
+        ros::spinOnce();
+        ros::Duration(0.1).sleep();
+        continue;
+      }
+      ROS_INFO_STREAM("run_pipeline_: " << run_pipeline_);
+
       if(!this->configure()) {
         ROS_FATAL("Failed to configure gscam!");
         break;
@@ -430,14 +457,35 @@ namespace gscam {
       ROS_INFO("GStreamer stream stopped!");
 
       if(reopen_on_eof_) {
+        run_pipeline_ = true;
         ROS_INFO("Reopening stream...");
-      } else {
+      } else if(run_pipeline_) {
         ROS_INFO("Cleaning up stream and exiting...");
         break;
       }
     }
 
   }
+
+  bool GSCam::start_pipeline_cb(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response) 
+  {
+    run_pipeline_ = true;
+    return true;
+  }
+
+  bool GSCam::stop_pipeline_cb(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response) 
+  {
+    run_pipeline_ = false;
+    return true;
+  }
+
+  bool GSCam::reconfigure_pipeline_cb(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response) 
+  {
+    run_pipeline_ = false;
+    reconfigure_ = true;
+    return true;
+  }
+
 
   // Example callbacks for appsink
   // TODO: enable callback-based capture
