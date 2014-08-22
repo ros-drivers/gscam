@@ -15,6 +15,8 @@ extern "C"{
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
 
+#include <std_srvs/Empty.h>
+
 #include <stdexcept>
 
 namespace gscam {
@@ -62,6 +64,19 @@ namespace gscam {
     // Case of a jpeg only publisher
     ros::Publisher jpeg_pub_;
     ros::Publisher cinfo_pub_;
+
+    bool run_pipeline_;
+    bool reconfigure_;
+
+    ros::ServiceServer start_service_;
+    ros::ServiceServer stop_service_;
+    ros::ServiceServer reconfigure_service_;
+
+    bool start_pipeline_cb(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response);
+
+    bool stop_pipeline_cb(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response); 
+
+    bool reconfigure_pipeline_cb(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response);
   };
 
 }
