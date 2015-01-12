@@ -36,7 +36,7 @@ namespace gscam {
     nh_(nh_camera),
     nh_private_(nh_private),
     image_transport_(nh_camera),
-    camera_info_manager_(nh_camera)
+    camera_info_manager_(nh_private)
   {
   }
 
@@ -203,10 +203,10 @@ namespace gscam {
 
     // Create ROS camera interface
     if (image_encoding_ == "jpeg") {
-        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1);
-        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1);
+        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>(camera_name_ + "/image_raw/compressed",1);
+        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>(camera_name_ + "/camera_info",1);
     } else {
-        camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+        camera_pub_ = image_transport_.advertiseCamera(camera_name_ + "/image_raw", 1);
     }
 
     return true;
