@@ -389,6 +389,14 @@ namespace gscam {
 
   }
 
+  void GSCam::stop() {
+    ROS_INFO("Stop requested");
+    reopen_on_eof_ = false;
+    if(pipeline_) {
+      gst_element_set_state(pipeline_, GST_STATE_NULL);
+    }
+  }
+
   // Example callbacks for appsink
   // TODO: enable callback-based capture
   void gst_eos_cb(GstAppSink *appsink, gpointer user_data ) {

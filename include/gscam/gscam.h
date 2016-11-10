@@ -30,6 +30,7 @@ namespace gscam {
     void cleanup_stream();
 
     void run();
+    void stop();
 
   private:
     // General gstreamer configuration

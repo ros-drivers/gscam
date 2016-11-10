@@ -16,6 +16,7 @@ namespace gscam {
 
   GSCamNodelet::~GSCamNodelet() 
   {
+    gscam_driver_->stop();
     stream_thread_->join();
   }
 
