@@ -6,6 +6,7 @@
     devices such as webcams.
   </description>
   <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
+  <maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>
   <license>BSD</license>
 
   <author email="jbo@jhu.edu">Jonathan Bohren</author>
