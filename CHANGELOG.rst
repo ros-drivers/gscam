@@ -2,6 +2,15 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Gstreamer 1 0 support (`#36 <https://github.com/ros-drivers/gscam/issues/36>`_ )
+  * delete unused manifest.xml, rosdep.yaml
+  * use libgstreamer1.0 for lunar
+  * Fixing preproc switches so that the 1.0 branch still builds against 0.1 without the switch flags
+  * Preliminary GStreamer-1.0 support see README for more info
+* Contributors: Jonathan Bohren, Kei Okada
+
 0.2.0 (2017-06-13)
 ------------------
 * add ROS Orphaned Package Maintainers to maintainer tag (`#35 <https://github.com/ros-drivers/gscam/issues/35>`_ )
