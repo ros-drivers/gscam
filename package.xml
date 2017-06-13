@@ -15,8 +15,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>libgstreamer0.10-dev</build_depend>
-  <build_depend>libgstreamer-plugins-base0.10-dev</build_depend>
+  <build_depend>libgstreamer1.0-dev</build_depend>
+  <build_depend>libgstreamer-plugins-base1.0-dev</build_depend>
 
   <build_depend>nodelet</build_depend>
   <build_depend>cv_bridge</build_depend>
