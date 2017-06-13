@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2017-06-13)
+------------------
 * Gstreamer 1 0 support (`#36 <https://github.com/ros-drivers/gscam/issues/36>`_ )
   * delete unused manifest.xml, rosdep.yaml
   * use libgstreamer1.0 for lunar
