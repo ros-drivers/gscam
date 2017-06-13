@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2017-06-13)
+------------------
 * add ROS Orphaned Package Maintainers to maintainer tag (`#35 <https://github.com/ros-drivers/gscam/issues/35>`_ )
 * gscam_nodelet.h: include scoped_ptr.hpp to compile with boost 1.57
   When compiling gscam with the currently latest boost version 1.57,
