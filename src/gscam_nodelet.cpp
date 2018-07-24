@@ -4,7 +4,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <gscam/gscam_nodelet.h>
 
-PLUGINLIB_DECLARE_CLASS(gscam, GSCamNodelet, gscam::GSCamNodelet, nodelet::Nodelet) 
+PLUGINLIB_EXPORT_CLASS(gscam::GSCamNodelet, nodelet::Nodelet) 
 
 namespace gscam {
   GSCamNodelet::GSCamNodelet() :
