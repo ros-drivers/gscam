@@ -1,4 +1,4 @@
-# GScam [![Build Status](https://travis-ci.org/ros-drivers/gscam.svg?branch=master)](https://travis-ci.org/ros-drivers/gscam)
+# GSCam [![Build Status](https://travis-ci.org/ros-drivers/gscam.svg?branch=master)](https://travis-ci.org/ros-drivers/gscam)
 =============================================================================================================================
 
 This is a ROS package originally developed by the [Brown Robotics
