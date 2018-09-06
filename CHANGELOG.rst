@@ -2,6 +2,18 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#52 <https://github.com/ros-drivers/gscam/issues/52>`_ from k-okada/add_travis
+  update travis.yml
+* Update README.md
+  gscam -> GSCam
+* update travis.yml
+* Merge pull request `#40 <https://github.com/ros-drivers/gscam/issues/40>`_ from ros-drivers/mikaelarguedas-patch-1
+  update to use non deprecated pluginlib macro
+* update to use non deprecated pluginlib macro
+* Contributors: Kei Okada, Mikael Arguedas
+
 1.0.0 (2017-06-13)
 ------------------
 * Gstreamer 1 0 support (`#36 <https://github.com/ros-drivers/gscam/issues/36>`_ )
