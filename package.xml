@@ -1,6 +1,6 @@
 <package>
   <name>gscam</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>
     A ROS camera driver that uses gstreamer to connect to
     devices such as webcams.

@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2018-09-06)
+------------------
 * Merge pull request `#52 <https://github.com/ros-drivers/gscam/issues/52>`_ from k-okada/add_travis
   update travis.yml
 * Update README.md
