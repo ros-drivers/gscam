@@ -25,9 +25,31 @@ extern "C"{
 
 #include <camera_calibration_parsers/parse_ini.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include <gscam/gscam.h>
 
 namespace gscam {
+
+  template<typename SSP>
+  void topicDeprecationWarning(const SSP& pub)
+  {
+    std::string correct_topic = pub.getTopic();
+    boost::replace_first(correct_topic, "camera/", "");
+    ROS_WARN_STREAM(
+        "gscam: Your node, \""<<pub.getSubscriberName()<<"\" is subscribing to the DEPRECATED topic \""<<pub.getTopic()<<"\", which will be removed in the next release."
+        <<" Instead, it should subscribe to the same topic without the additional \"camera\" namespace \""<<correct_topic<<"\"."
+        <<" See https://github.com/ros-drivers/gscam/pull/16 for more info.");
+  }
+
+  void rosTopicDeprecationWarning(const ros::SingleSubscriberPublisher &pub) {
+    topicDeprecationWarning(pub);
+  }
+
+  void imageTransportTopicDeprecationWarning(const image_transport::SingleSubscriberPublisher &pub) {
+    topicDeprecationWarning(pub);
+  }
+
 
   GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) :
     gsconfig_(""),
@@ -36,6 +58,7 @@ namespace gscam {
     nh_(nh_camera),
     nh_private_(nh_private),
     image_transport_(nh_camera),
+    image_transport_deprecated_(ros::NodeHandle(nh_camera,"camera")),
     camera_info_manager_(nh_camera)
   {
   }
@@ -220,10 +243,19 @@ namespace gscam {
 
     // Create ROS camera interface
     if (image_encoding_ == "jpeg") {
-        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1);
-        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1);
+        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("image_raw/compressed",1);
+        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera_info",1);
+
+        jpeg_pub_deprecated_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1,rosTopicDeprecationWarning);
+        cinfo_pub_deprecated_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1,rosTopicDeprecationWarning);
     } else {
-        camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+        camera_pub_ = image_transport_.advertiseCamera("image_raw", 1);
+
+        camera_pub_deprecated_ = image_transport_deprecated_.advertiseCamera(
+            "image_raw", 1,
+            imageTransportTopicDeprecationWarning, image_transport::SubscriberStatusCallback(),
+            rosTopicDeprecationWarning, ros::SubscriberStatusCallback()
+            );
     }
 
     return true;
@@ -344,6 +376,9 @@ namespace gscam {
                   img->data.begin());
           jpeg_pub_.publish(img);
           cinfo_pub_.publish(cinfo);
+
+          jpeg_pub_deprecated_.publish(img);
+          cinfo_pub_deprecated_.publish(cinfo);
       } else {
           // Complain if the returned buffer is smaller than we expect
           const unsigned int expected_frame_size =
@@ -384,6 +419,7 @@ namespace gscam {
 
           // Publish the image/info
           camera_pub_.publish(img, cinfo);
+          camera_pub_deprecated_.publish(img, cinfo);
       }
 
       // Release the buffer
