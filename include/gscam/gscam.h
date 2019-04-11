@@ -15,6 +15,9 @@ extern "C"{
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
 
+#include <diagnostic_updater/diagnostic_updater.h>
+#include <diagnostic_updater/publisher.h>
+
 #include <stdexcept>
 
 namespace gscam {
@@ -28,6 +31,7 @@ namespace gscam {
     bool init_stream();
     void publish_stream();
     void cleanup_stream();
+    void diagnostic_update(const ros::TimerEvent&);
 
     void run();
 
@@ -48,6 +52,7 @@ namespace gscam {
     // Camera publisher configuration
     std::string frame_id_;
     int width_, height_;
+    double expected_fps_, fps_tolerance_;
     std::string image_encoding_;
     std::string camera_name_;
     std::string camera_info_url_;
@@ -62,6 +67,10 @@ namespace gscam {
     // Case of a jpeg only publisher
     ros::Publisher jpeg_pub_;
     ros::Publisher cinfo_pub_;
+
+    diagnostic_updater::Updater updater_;
+    diagnostic_updater::TopicDiagnostic* freq_diagnostic_;
+    ros::Timer diagnostic_update_timer_;
   };
 
 }
