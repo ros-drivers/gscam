@@ -19,6 +19,7 @@ extern "C"{
 #include <diagnostic_updater/publisher.h>
 
 #include <stdexcept>
+#include <string>
 
 namespace gscam {
 
@@ -53,6 +54,8 @@ namespace gscam {
     std::string frame_id_;
     int width_, height_;
     double expected_fps_, fps_tolerance_;
+    double min_delay_, max_delay_;
+    int diagnostic_window_;
     std::string image_encoding_;
     std::string camera_name_;
     std::string camera_info_url_;
