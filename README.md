@@ -23,10 +23,10 @@ Install dependencies via `rosdep`.
 ### 1.0.x: Experimental
 
 #### Dependencies:
- 
-* gstreamer1.0-tools 
-* libgstreamer1.0-dev 
-* libgstreamer-plugins-base1.0-dev 
+
+* gstreamer1.0-tools
+* libgstreamer1.0-dev
+* libgstreamer-plugins-base1.0-dev
 * libgstreamer-plugins-good1.0-dev
 
 Ubuntu Install:
@@ -76,11 +76,16 @@ This can be run as both a node and a nodelet.
 * `~frame_id`: The [TF](http://www.ros.org/wiki/tf) frame ID.
 * `~reopen_on_eof`: Re-open the stream if it ends (EOF).
 * `~sync_sink`: Synchronize the app sink (sometimes setting this to `false` can resolve problems with sub-par framerates).
+* `~diagnostic_fps`: The expected frame rate of the camera used for diagnostic purposes. If the value is 0, diagnostics are turned off. (default: 0)
+* `~diagnostic_window`: Number of events to consider in the statistics. See [FrequencyStatusParam](http://docs.ros.org/api/diagnostic_updater/html/structdiagnostic__updater_1_1FrequencyStatusParam.html).
+* `~fps_tolerance`: The percent tolerance (+/- as a fraction of 1.0) allowed from the diagnostic_fps value. See [FrequencyStatusParam](http://docs.ros.org/api/diagnostic_updater/html/structdiagnostic__updater_1_1FrequencyStatusParam.html). (Default: 0.1)
+* `~min_delay`: the minimum accepted seconds between two frames. See [TimeStampStatusParam](http://docs.ros.org/api/diagnostic_updater/html/structdiagnostic__updater_1_1TimeStampStatusParam.html) (default: 0)
+* `~max_delay`: the maximum accepted seconds between two frames. See [TimeStampStatusParam](http://docs.ros.org/api/diagnostic_updater/html/structdiagnostic__updater_1_1TimeStampStatusParam.html) (default: (1.0 / diagnostic_fps) * fps_tolerance)
 
 C++ API (unstable)
 ------------------
 
-The gscam c++ library can be used, but it is not guaranteed to be stable. 
+The gscam c++ library can be used, but it is not guaranteed to be stable.
 
 Examples
 --------
