@@ -42,6 +42,7 @@ namespace gscam {
 
   GSCam::~GSCam()
   {
+    delete freq_diagnostic_;
   }
 
   bool GSCam::configure()
@@ -83,7 +84,7 @@ namespace gscam {
     // Get the image encoding
     nh_private_.param("image_encoding", image_encoding_, sensor_msgs::image_encodings::RGB8);
     if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
-        image_encoding_ != sensor_msgs::image_encodings::MONO8 && 
+        image_encoding_ != sensor_msgs::image_encodings::MONO8 &&
         image_encoding_ != "jpeg") {
       ROS_FATAL_STREAM("Unsupported image encoding: " + image_encoding_);
     }
@@ -102,6 +103,25 @@ namespace gscam {
       frame_id_ = "/camera_frame";
       ROS_WARN_STREAM("No camera frame_id set, using frame \""<<frame_id_<<"\".");
       nh_private_.setParam("frame_id",frame_id_);
+    }
+
+    // Get diagnostic params. If expected_fps is > 0, diagnostics will be enabled
+    nh_private_.param("diagnostic_fps", expected_fps_, 0.0);
+    nh_private_.param("fps_tolerance", fps_tolerance_, 0.1);
+    nh_private_.param("min_delay", min_delay_, 0.0);
+    nh_private_.param("max_delay", max_delay_, (1.0/expected_fps_)*fps_tolerance_);
+    nh_private_.param("diagnostic_window", diagnostic_window_, 10);
+
+    if (expected_fps_> 0) {
+      ROS_INFO_STREAM("Setting up diagnostics at " << expected_fps_ << " fps.");
+      updater_.setHardwareID(frame_id_);
+      freq_diagnostic_ = new diagnostic_updater::TopicDiagnostic("camera", updater_,
+        diagnostic_updater::FrequencyStatusParam(
+          &expected_fps_, &expected_fps_, fps_tolerance_, diagnostic_window_),
+        diagnostic_updater::TimeStampStatusParam(0, max_delay_));
+
+      diagnostic_update_timer_ = nh_.createTimer(ros::Duration(1.0),
+        &GSCam::diagnostic_update, this);
     }
 
     return true;
@@ -132,19 +152,19 @@ namespace gscam {
 #if (GST_VERSION_MAJOR == 1)
     // http://gstreamer.freedesktop.org/data/doc/gstreamer/head/pwg/html/section-types-definitions.html
     if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {
-        caps = gst_caps_new_simple( "video/x-raw", 
+        caps = gst_caps_new_simple( "video/x-raw",
             "format", G_TYPE_STRING, "RGB",
-            NULL); 
+            NULL);
     } else if (image_encoding_ == sensor_msgs::image_encodings::MONO8) {
-        caps = gst_caps_new_simple( "video/x-raw", 
+        caps = gst_caps_new_simple( "video/x-raw",
             "format", G_TYPE_STRING, "GRAY8",
-            NULL); 
+            NULL);
     } else if (image_encoding_ == "jpeg") {
         caps = gst_caps_new_simple("image/jpeg", NULL, NULL);
     }
 #else
     if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {
-        caps = gst_caps_new_simple( "video/x-raw-rgb", NULL,NULL); 
+        caps = gst_caps_new_simple( "video/x-raw-rgb", NULL,NULL);
     } else if (image_encoding_ == sensor_msgs::image_encodings::MONO8) {
         caps = gst_caps_new_simple("video/x-raw-gray", NULL, NULL);
     } else if (image_encoding_ == "jpeg") {
@@ -263,7 +283,7 @@ namespace gscam {
     ROS_INFO("Started stream.");
 
     // Poll the data as fast a spossible
-    while(ros::ok()) 
+    while(ros::ok())
     {
       // This should block until a new frame is awake, this way, we'll run at the
       // actual capture framerate of the device.
@@ -395,8 +415,17 @@ namespace gscam {
         gst_buffer_unref(buf);
       }
 
+      if (expected_fps_ > 0) {
+        freq_diagnostic_->tick(cinfo->header.stamp);
+        updater_.update();
+      }
+
       ros::spinOnce();
     }
+  }
+
+  void GSCam::diagnostic_update(const ros::TimerEvent&) {
+    updater_.update();
   }
 
   void GSCam::cleanup_stream()
@@ -436,7 +465,7 @@ namespace gscam {
         break;
       }
     }
-
+    ros::shutdown();
   }
 
   // Example callbacks for appsink
