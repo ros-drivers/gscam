@@ -392,7 +392,12 @@ namespace gscam {
         gst_memory_unmap(memory, &info);
         gst_memory_unref(memory);
 #endif
+
+#if(GST_VERSION_MAJOR >= 1 && GST_VERSION_MINOR >= 16)
+        gst_sample_unref(sample);
+#else
         gst_buffer_unref(buf);
+#endif
       }
 
       ros::spinOnce();
