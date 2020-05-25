@@ -128,6 +128,7 @@ namespace gscam {
     // Create RGB sink
     sink_ = gst_element_factory_make("appsink",NULL);
     GstCaps * caps = gst_app_sink_get_caps(GST_APP_SINK(sink_));
+    gst_app_sink_set_max_buffers(GST_APP_SINK(sink_), 1);
 
 #if (GST_VERSION_MAJOR == 1)
     // http://gstreamer.freedesktop.org/data/doc/gstreamer/head/pwg/html/section-types-definitions.html
