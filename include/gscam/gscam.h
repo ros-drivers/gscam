@@ -6,24 +6,26 @@ extern "C"{
 #include <gst/app/gstappsink.h>
 }
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
 
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <sensor_msgs/SetCameraInfo.h>
+#include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/compressed_image.hpp>
+#include <sensor_msgs/msg/camera_info.hpp>
+#include <sensor_msgs/srv/set_camera_info.hpp>
 
 #include <stdexcept>
 
 namespace gscam {
 
-  class GSCam {
+  class GSCam : public rclcpp::Node {
   public:
-    GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private);
+    GSCam(const rclcpp::NodeOptions &options);
     ~GSCam();
 
+  private:
     bool configure();
     bool init_stream();
     void publish_stream();
@@ -31,7 +33,6 @@ namespace gscam {
 
     void run();
 
-  private:
     // General gstreamer configuration
     std::string gsconfig_;
 
@@ -55,13 +56,14 @@ namespace gscam {
     // ROS Inteface
     // Calibration between ros::Time and gst timestamps
     double time_offset_;
-    ros::NodeHandle nh_, nh_private_;
-    image_transport::ImageTransport image_transport_;
     camera_info_manager::CameraInfoManager camera_info_manager_;
     image_transport::CameraPublisher camera_pub_;
     // Case of a jpeg only publisher
-    ros::Publisher jpeg_pub_;
-    ros::Publisher cinfo_pub_;
+    rclcpp::Publisher<sensor_msgs::msg::CompressedImage>::SharedPtr jpeg_pub_;
+    rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr cinfo_pub_;
+
+    // Poll gstreamer on a separate thread
+    std::thread pipeline_thread_;
   };
 
 }

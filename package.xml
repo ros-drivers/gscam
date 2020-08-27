@@ -1,4 +1,6 @@
-<package>
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>gscam</name>
   <version>1.0.1</version>
   <description>
@@ -13,29 +15,22 @@
   <author email="tjay@cs.brown.edu">Graylin Trevor Jay</author>
   <author email="chriscrick@cs.brown.edu">Christopher Crick</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>libgstreamer1.0-dev</build_depend>
-  <build_depend>libgstreamer-plugins-base1.0-dev</build_depend>
+  <depend>libgstreamer1.0-dev</depend>
+  <depend>libgstreamer-plugins-base1.0-dev</depend>
 
-  <build_depend>nodelet</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>camera_calibration_parsers</build_depend>
-  <build_depend>camera_info_manager</build_depend>
+  <depend>class_loader</depend>
+  <depend>cv_bridge</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>image_transport</depend>
+  <depend>sensor_msgs</depend>
+  <depend>camera_calibration_parsers</depend>
+  <depend>camera_info_manager</depend>
 
-  <run_depend>nodelet</run_depend>
-  <run_depend>cv_bridge</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>image_transport</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>camera_calibration_parsers</run_depend>
-  <run_depend>camera_info_manager</run_depend>
-  
   <export>
-      <nodelet plugin="${prefix}/nodelet_plugins.xml"/>
+    <build_type>ament_cmake</build_type>
   </export>
 
 
