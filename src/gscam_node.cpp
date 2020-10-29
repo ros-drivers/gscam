@@ -1,14 +1,17 @@
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <gscam/gscam.h>
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "gscam_publisher");
-  ros::NodeHandle nh, nh_private("~");
+  rclcpp::init(argc, argv);
 
-  gscam::GSCam gscam_driver(nh, nh_private);
-  gscam_driver.run();
+  rclcpp::NodeOptions options;
+  options.use_intra_process_comms(false);
 
+  auto gscam_driver = std::make_shared<gscam::GSCam>(options);
+  rclcpp::spin(gscam_driver);
+
+  rclcpp::shutdown();
   return 0;
 }
 
