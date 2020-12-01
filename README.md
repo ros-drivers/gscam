@@ -97,5 +97,6 @@ are examples for:
 * [DeckLink](launch/decklink.launch):
   [BlackMagic](http://www.blackmagicdesign.com/products/decklink/models)
   DeckLink SDI capture cards (note: this requires the `gst-plugins-bad` plugins)
-  [tdgigevsrc] (launch/tdgigev.launch launch/tdgigev_bayer.launch) requires the Teledyne DALSA GigE-V Source plugin 
+* [tdgigevsrc](launch/tdgigev.launch launch/tdgigev_bayer.launch) for GigeVision cameras.
+       This requires the Teledyne DALSA GigE-V Source plugin for gstreamer-1.0
 
