@@ -1,0 +1,27 @@
+<launch>
+  <!-- This launchfile should bring up a node that broadcasts a ros image
+       transport on /gigev_cam#/image_raw -->
+
+
+  <!-- Select camera by Index or IP or SerialNumber or DeviceName feature (only one though) -->
+  <!-- Examples shown here...  
+            <arg name="GIGECAMID" default="cam-index=0"/>
+            <arg name="GIGECAMID" default="cam-ip=169:254:5:20"/>
+            <arg name="GIGECAMID" default="cam-sn=S1113716"/>
+            <arg name="GIGECAMID" default="cam-name=A0000546"/>
+       For multiple cameras - Remember to use unique node names in each launch file -->
+
+  <!-- The GStreamer framerate needs to be an integral fraction -->
+  <arg name="CAMINDEX" default="0"/>
+  <arg name="GIGECAMID" default="cam-index=$(arg CAMINDEX)"/>
+  <arg name="PUBLISH_FRAME" default="false"/>
+  <arg name="CFGFILE" default="false"/>
+
+  <node name="gscam" pkg="gscam" type="gscam" output="screen">
+    <param name="camera_name" value="/gigev_cam$(arg CAMINDEX)"/>
+    <param unless="$(arg CFGFILE)" name="gscam_config" value="tdgigevsrc $(arg GIGECAMID) ! queue ! bayer2rgb ! videoconvert"/>
+    <param if="$(arg CFGFILE)" name="gscam_config" value="tdgigevsrc $(arg GIGECAMID) cfg-file=$(arg CFGFILE) ! queue ! bayer2rgb ! videoconvert"/>
+    <param name="frame_id" value="default"/>
+    <param name="sync_sink" value="true"/>
+  </node>
+</launch>

@@ -1,5 +1,4 @@
-
-# this is .traivs.yml written by ./create_travis_settings.py
+# this is .traivs.yml written by -
 
 # https://github.com/ros-infrastructure/ros_buildfarm/blob/master/doc/jobs/devel_jobs.rst
 # https://github.com/ros-infrastructure/ros_buildfarm/blob/master/doc/jobs/prerelease_jobs.rst
@@ -8,16 +7,13 @@ sudo: true
 dist: trusty
 language: python
 python:
-  - "3.4"
+  - "3.6"
 env:
   global:
     - JOB_PATH=/tmp/devel_job
     - ABORT_ON_TEST_FAILURE=1
   matrix:
-    - ROS_DISTRO_NAME=indigo  OS_NAME=ubuntu OS_CODE_NAME=trusty ARCH=amd64
-    - ROS_DISTRO_NAME=kinetic OS_NAME=ubuntu OS_CODE_NAME=xenial ARCH=amd64
-    - ROS_DISTRO_NAME=lunar   OS_NAME=ubuntu OS_CODE_NAME=xenial ARCH=amd64
-    - ROS_DISTRO_NAME=melodic OS_NAME=ubuntu OS_CODE_NAME=bionic ARCH=amd64
+    - ROS_DISTRO_NAME=noetic  OS_NAME=ubuntu OS_CODE_NAME=focal  ARCH=amd64
 #   matrix:
 #     allow_failures:
 #       - env: ROS_DISTRO_NAME=kinetic OS_NAME=ubuntu OS_CODE_NAME=xenial ARCH=amd64

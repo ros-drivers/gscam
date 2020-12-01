@@ -1,9 +1,16 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 
 project(gscam)
 
 # System Dependencies
-find_package(PkgConfig)
+# pkg-config libraries
+find_package(PkgConfig REQUIRED)
+
+#
+# For Noetic 
+#   - removed ROSBUILD target (deprecated)
+#   - should remove gstreamer-0.10 support (old)
+#
 
 pkg_check_modules(GSTREAMER QUIET gstreamer-0.10)
 if(NOT GSTREAMER_FOUND)
@@ -19,112 +26,67 @@ else()
   pkg_check_modules(GST_APP REQUIRED gstreamer-app-0.10)
 endif()
 
-if(USE_ROSBUILD)
-  # Use rosbuild
-  include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-  rosbuild_init()
+# Use Catkin build tools.
+find_package(catkin REQUIRED COMPONENTS roscpp image_transport sensor_msgs camera_calibration_parsers camera_info_manager )
 
-  set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-  set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS roscpp image_transport sensor_msgs camera_calibration_parsers camera_info_manager
+  DEPENDS GSTREAMER GST_APP
+)
 
-  include_directories(${GLIB_INCLUDE_DIRS} ${GST_APP_INCLUDE_DIRS})
+# Build defs
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${GLIB_INCLUDE_DIRS}
+  ${GST_APP_INCLUDE_DIRS}
+)
 
-  rosbuild_add_library(gscam src/gscam.cpp)
-  target_link_libraries(gscam
-    ${GSTREAMER_LIBRARIES}
-    ${GST_APP_LIBRARIES})
+add_library(${PROJECT_NAME} src/gscam.cpp)
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${GSTREAMER_LIBRARIES}
+  ${GST_APP_LIBRARIES}
+)
 
-  rosbuild_add_executable(gscam_node src/gscam_node.cpp)
-  target_link_libraries(gscam_node gscam
-    ${GSTREAMER_LIBRARIES}
-    ${GST_APP_LIBRARIES})
-  set_target_properties(gscam_node PROPERTIES OUTPUT_NAME gscam)
+add_executable(${PROJECT_NAME}_node src/gscam_node.cpp)
+target_link_libraries(${PROJECT_NAME}_node 
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${GSTREAMER_LIBRARIES}
+  ${GST_APP_LIBRARIES}
+)
+set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
-  rosbuild_add_library(GSCamNodelet src/gscam_nodelet.cpp)
-  target_link_libraries(GSCamNodelet gscam
-    ${GSTREAMER_LIBRARIES}
-    ${GST_APP_LIBRARIES})
+# Install directives
 
-else()
-  # Use Catkin
-  find_package(catkin REQUIRED 
-    COMPONENTS roscpp image_transport sensor_msgs nodelet
-    camera_calibration_parsers camera_info_manager
-    )
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node 
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
-  catkin_package(
-    INCLUDE_DIRS include
-    LIBRARIES gscam
-    CATKIN_DEPENDS roscpp nodelet image_transport sensor_msgs
-    camera_calibration_parsers camera_info_manager
-    DEPENDS GSTREAMER GST_APP
-    )
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+)
 
-  include_directories(
-    include
-    ${catkin_INCLUDE_DIRS}
-    ${GLIB_INCLUDE_DIRS}
-    ${GST_APP_INCLUDE_DIRS})
+install(FILES nodelet_plugins.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
-  add_library(gscam src/gscam.cpp)
-  target_link_libraries(gscam
-    ${catkin_LIBRARIES}
-    ${GSTREAMER_LIBRARIES}
-    ${GST_APP_LIBRARIES})
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  FILES_MATCHING PATTERN "*.launch"
+)
 
-  add_executable(gscam_node src/gscam_node.cpp)
-  target_link_libraries(gscam_node gscam
-    ${catkin_LIBRARIES}
-    ${GSTREAMER_LIBRARIES}
-    ${GST_APP_LIBRARIES})
-  set_target_properties(gscam_node PROPERTIES OUTPUT_NAME gscam)
+install(FILES examples/uncalibrated_parameters.ini
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/examples
+)
 
-  add_library(GSCamNodelet src/gscam_nodelet.cpp)
-  target_link_libraries(GSCamNodelet gscam
-    ${catkin_LIBRARIES}
-    ${GSTREAMER_LIBRARIES}
-    ${GST_APP_LIBRARIES})
+set(EXECUTABLE_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME})
 
-  # Install directives
-
-  install(TARGETS gscam gscam_node GSCamNodelet
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-    )
-
-  install(DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-    PATTERN ".svn" EXCLUDE)
-
-  install(FILES nodelet_plugins.xml
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-    )
-
-  install(FILES
-    examples/v4l.launch
-    examples/gscam_nodelet.launch
-    examples/nodelet_pipeline.launch
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-    )
-
-  install(FILES examples/uncalibrated_parameters.ini
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/examples
-    )
-
-  # Interim compatibility
-  # Remove this in the next release
-  install(FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node
-    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-  set(EXECUTABLE_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/lib/${PROJECT_NAME})
-endif()
-
-# Interim compatibility
-# Remove this in the next distribution release
-configure_file(scripts/gscam_node.in ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node)
-file(COPY ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node 
-  DESTINATION ${EXECUTABLE_OUTPUT_PATH}
-  FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 

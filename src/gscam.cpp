@@ -223,7 +223,14 @@ namespace gscam {
         jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>("camera/image_raw/compressed",1);
         cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>("camera/camera_info",1);
     } else {
-        camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+        if ( camera_name_.compare("default") ) {
+            std::string camname_;
+            camname_ = camera_name_ + "/image_raw"; 
+            camera_pub_ = image_transport_.advertiseCamera(camname_.c_str(), 1);
+        }
+        else {
+            camera_pub_ = image_transport_.advertiseCamera("camera/image_raw", 1);
+        }
     }
 
     return true;
@@ -291,16 +298,6 @@ namespace gscam {
       //         GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_, buf->timestamp, bt, time_offset_);
 
 
-#if 0
-      GstFormat fmt = GST_FORMAT_TIME;
-      gint64 current = -1;
-
-       Query the current position of the stream
-      if (gst_element_query_position(pipeline_, &fmt, &current)) {
-          ROS_INFO_STREAM("Position "<<current);
-      }
-#endif
-
       // Stop on end of stream
       if (!buf) {
         ROS_INFO("Stream ended.");
@@ -310,10 +307,10 @@ namespace gscam {
       // ROS_DEBUG("Got data.");
 
       // Get the image width and height
-      GstPad* pad = gst_element_get_static_pad(sink_, "sink");
 #if (GST_VERSION_MAJOR == 1)
-      const GstCaps *caps = gst_pad_get_current_caps(pad);
+      GstCaps *caps = gst_sample_get_caps(sample);
 #else
+      GstPad* pad = gst_element_get_static_pad(sink_, "sink");
       const GstCaps *caps = gst_pad_get_negotiated_caps(pad);
 #endif
       GstStructure *structure = gst_caps_get_structure(caps,0);
@@ -389,10 +386,18 @@ namespace gscam {
       // Release the buffer
       if(buf) {
 #if (GST_VERSION_MAJOR == 1)
+        // Unmap the memory
         gst_memory_unmap(memory, &info);
         gst_memory_unref(memory);
 #endif
-        gst_buffer_unref(buf);
+        // Do not unref the buffer obtained by gst_sample_get_buffer
+        // (We do not own the reference to it!)
+        // NO : gst_buffer_unref(buf);
+        //
+         // Release the sample
+         if (sample) {
+            gst_sample_unref(sample);
+         }
       }
 
       ros::spinOnce();
