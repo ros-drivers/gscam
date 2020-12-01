@@ -9,7 +9,7 @@ several fixes incorporated into it to make it broadcast correct
 `sensor_msgs/Image` messages with proper frames and timestamps. It also allows
 for more ROS-like configuration and more control over the GStreamer interface.
 
-Note that this pacakge can be built both in a rosbuild and catkin workspaces.
+Note that this pacakge now only supports building in catkin workspaces.
 
 GStreamer Library Support
 -------------------------
@@ -38,7 +38,7 @@ sudo add-apt-repository ppa:gstreamer-developers/ppa
 sudo apt-get install gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev
 ```
 
-##### 14.04
+##### 14.04 + 16.04 + 18.04 + 20.04
 
 ```sh
 sudo apt-get install gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev
@@ -46,7 +46,7 @@ sudo apt-get install gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins
 
 #### Usage:
 * Use the CMake flag `-DGSTREAMER_VERSION_1_x=On` when building
-* See the [Video4Linux2 launchfile example](examples/v4l.launch) for
+* See the [Video4Linux2 launchfile example](launch/v4l.launch) for
   an example of the differences in the GStreamer config lines
 
 #### Notes:
@@ -70,7 +70,7 @@ This can be run as both a node and a nodelet.
 * `camera/set_camera_info`
 
 #### Parameters
-* `~camera_name`: The name of the camera (corrsponding to the camera info)
+* `~camera_name`: The name of the camera (corresponding to the camera info - `camera_name/` replaces `camera/` in the topic list)
 * `~camera_info_url`: A url (`file://path/to/file`, `package://pkg_name/path/to/file`) to the [camera calibration file](http://www.ros.org/wiki/camera_calibration_parsers#File_formats).
 * `~gscam_config`: The GStreamer [configuration string](http://wiki.oz9aec.net/index.php?title=Gstreamer_cheat_sheet&oldid=1829).
 * `~frame_id`: The [TF](http://www.ros.org/wiki/tf) frame ID.
@@ -88,12 +88,14 @@ Examples
 See example launchfiles and configs in the examples directory. Currently there
 are examples for:
 
-* [Video4Linux2](examples/v4l.launch): Standard
+* [Video4Linux2](launch/v4l.launch): Standard
   [video4linux](http://en.wikipedia.org/wiki/Video4Linux)-based cameras like
   USB webcams.
     * ***GST-1.0:*** Use the roslaunch argument `GST10:=True` for GStreamer 1.0 variant
-* [Nodelet](examples/gscam_nodelet.launch): Run a V4L-based camera in a nodelet
-* [Video File](examples/videofile.launch): Any videofile readable by GStreamer
-* [DeckLink](examples/decklink.launch):
+* [Nodelet](launch/gscam_nodelet.launch): Run a V4L-based camera in a nodelet
+* [Video File](launch/videofile.launch): Any videofile readable by GStreamer
+* [DeckLink](launch/decklink.launch):
   [BlackMagic](http://www.blackmagicdesign.com/products/decklink/models)
   DeckLink SDI capture cards (note: this requires the `gst-plugins-bad` plugins)
+  [tdgigevsrc] (launch/tdgigev.launch launch/tdgigev_bayer.launch) requires the Teledyne DALSA GigE-V Source plugin 
+
