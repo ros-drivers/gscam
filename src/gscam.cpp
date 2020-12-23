@@ -84,6 +84,7 @@ namespace gscam {
     nh_private_.param("image_encoding", image_encoding_, sensor_msgs::image_encodings::RGB8);
     if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
         image_encoding_ != sensor_msgs::image_encodings::MONO8 && 
+        image_encoding_ != sensor_msgs::image_encodings::MONO16 &&
         image_encoding_ != "jpeg") {
       ROS_FATAL_STREAM("Unsupported image encoding: " + image_encoding_);
     }
@@ -139,6 +140,10 @@ namespace gscam {
         caps = gst_caps_new_simple( "video/x-raw", 
             "format", G_TYPE_STRING, "GRAY8",
             NULL); 
+    } else if (image_encoding_ == sensor_msgs::image_encodings::MONO16) {
+        caps = gst_caps_new_simple( "video/x-raw",
+            "format", G_TYPE_STRING, "GRAY16_LE",
+            NULL);
     } else if (image_encoding_ == "jpeg") {
         caps = gst_caps_new_simple("image/jpeg", NULL, NULL);
     }
@@ -147,6 +152,11 @@ namespace gscam {
         caps = gst_caps_new_simple( "video/x-raw-rgb", NULL,NULL); 
     } else if (image_encoding_ == sensor_msgs::image_encodings::MONO8) {
         caps = gst_caps_new_simple("video/x-raw-gray", NULL, NULL);
+    } else if (image_encoding_ == sensor_msgs::image_encodings::MONO16) {
+        caps = gst_caps_new_simple("video/x-raw-gray",
+            "bpp", G_TYPE_INT,16,
+            "depth", G_TYPE_INT,16,
+            "endianness", G_TYPE_INT,1234, NULL);
     } else if (image_encoding_ == "jpeg") {
         caps = gst_caps_new_simple("image/jpeg", NULL, NULL);
     }
@@ -346,10 +356,16 @@ namespace gscam {
           cinfo_pub_.publish(cinfo);
       } else {
           // Complain if the returned buffer is smaller than we expect
-          const unsigned int expected_frame_size =
-              image_encoding_ == sensor_msgs::image_encodings::RGB8
-              ? width_ * height_ * 3
-              : width_ * height_;
+          unsigned int expected_frame_size;
+          if(image_encoding_ == sensor_msgs::image_encodings::RGB8){
+            expected_frame_size = width_ * height_ * 3;
+          }
+          else if ( image_encoding_ == sensor_msgs::image_encodings::MONO8) {
+            expected_frame_size = width_ * height_;
+          }
+          else if ( image_encoding_ == sensor_msgs::image_encodings::MONO16) {
+            expected_frame_size = width_ * height_ * 2;
+          }
 
           if (buf_size < expected_frame_size) {
               ROS_WARN_STREAM( "GStreamer image buffer underflow: Expected frame to be "
@@ -372,10 +388,14 @@ namespace gscam {
           // Copy only the data we received
           // Since we're publishing shared pointers, we need to copy the image so
           // we can free the buffer allocated by gstreamer
-          if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {
-              img->step = width_ * 3;
-          } else {
-              img->step = width_;
+          if(image_encoding_ == sensor_msgs::image_encodings::RGB8){
+            img->step = width_ * 3;
+          }
+          else if ( image_encoding_ == sensor_msgs::image_encodings::MONO8) {
+            img->step = width_;
+          }
+          else if ( image_encoding_ == sensor_msgs::image_encodings::MONO16) {
+            img->step = width_ * 2;
           }
           std::copy(
                   buf_data,
