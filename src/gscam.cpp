@@ -109,6 +109,7 @@ bool GSCam::configure()
     declare_parameter("image_encoding", std::string(sensor_msgs::image_encodings::RGB8));
   if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
     image_encoding_ != sensor_msgs::image_encodings::MONO8 &&
+    image_encoding_ != sensor_msgs::image_encodings::YUV422 &&
     image_encoding_ != "jpeg")
   {
     RCLCPP_FATAL_STREAM(get_logger(), "Unsupported image encoding: " + image_encoding_);
@@ -168,6 +169,11 @@ bool GSCam::init_stream()
     caps = gst_caps_new_simple(
       "video/x-raw",
       "format", G_TYPE_STRING, "GRAY8",
+      NULL);
+  } else if (image_encoding_ == sensor_msgs::image_encodings::YUV422) {
+    caps = gst_caps_new_simple(
+      "video/x-raw",
+      "format", G_TYPE_STRING, "UYVY",
       NULL);
   } else if (image_encoding_ == "jpeg") {
     caps = gst_caps_new_simple("image/jpeg", NULL, NULL);
@@ -360,9 +366,7 @@ void GSCam::publish_stream()
     } else {
       // Complain if the returned buffer is smaller than we expect
       const unsigned int expected_frame_size =
-        image_encoding_ == sensor_msgs::image_encodings::RGB8 ?
-        width_ * height_ * 3 :
-        width_ * height_;
+        width_ * height_ * sensor_msgs::image_encodings::numChannels(image_encoding_);
 
       if (buf_size < expected_frame_size) {
         RCLCPP_WARN_STREAM(
@@ -386,11 +390,8 @@ void GSCam::publish_stream()
       // Copy only the data we received
       // Since we're publishing shared pointers, we need to copy the image so
       // we can free the buffer allocated by gstreamer
-      if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {
-        img->step = width_ * 3;
-      } else {
-        img->step = width_;
-      }
+      img->step = width_ * sensor_msgs::image_encodings::numChannels(image_encoding_);
+
       std::copy(
         buf_data,
         (buf_data) + (buf_size),
