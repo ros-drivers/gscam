@@ -122,7 +122,17 @@ namespace gscam {
     pipeline_ = gst_parse_launch(gsconfig_.c_str(), &error);
     if (pipeline_ == NULL) {
       ROS_FATAL_STREAM( error->message );
+      g_error_free(error);
       return false;
+    }
+    
+    // https://gstreamer.freedesktop.org/documentation/gstreamer/gstparse.html?gi-language=c
+    // You might get a return value that is not NULL even though the error is set.
+    // In this case there was a recoverable parsing error and you can try to play the pipeline.
+    if (error != 0)
+    {
+        ROS_WARN_STREAM("Recoverable parsing error encountered: " << error->message);
+        g_error_free(error);
     }
 
     // Create RGB sink
