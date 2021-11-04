@@ -3,27 +3,20 @@
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-
-
 #include <iostream>
+
 extern "C"{
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
 }
 
-#include <rclcpp/rclcpp.hpp>
-
-#include <image_transport/image_transport.h>
-#include <camera_info_manager/camera_info_manager.h>
-
+#include <image_transport/image_transport.hpp>
+#include <camera_info_manager/camera_info_manager.hpp>
 
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/compressed_image.hpp>
 #include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/srv/set_camera_info.hpp>
 #include <sensor_msgs/image_encodings.hpp>
-
-#include <camera_calibration_parsers/parse_ini.h>
 
 #include <gscam/gscam.h>
 
