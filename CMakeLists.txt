@@ -5,19 +5,8 @@ project(gscam)
 # System Dependencies
 find_package(PkgConfig)
 
-pkg_check_modules(GSTREAMER QUIET gstreamer-0.10)
-if(NOT GSTREAMER_FOUND)
-  set(GSTREAMER_VERSION_1_x TRUE)
-endif()
-if(GSTREAMER_VERSION_1_x)
-  message(STATUS "gst 1.0")
-  pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
-  pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
-else()
-  message(STATUS "gst 0.1")
-  pkg_check_modules(GSTREAMER REQUIRED gstreamer-0.10)
-  pkg_check_modules(GST_APP REQUIRED gstreamer-app-0.10)
-endif()
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
 
 find_package(ament_cmake REQUIRED)
 find_package(class_loader REQUIRED)
@@ -60,7 +49,7 @@ ament_export_dependencies(class_loader)
 
 ament_export_include_directories(include)
 
-ament_export_interfaces(export_gscam)
+ament_export_targets(export_gscam)
 
 ament_export_libraries(gscam)
 
