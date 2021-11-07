@@ -18,7 +18,7 @@ extern "C"{
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/image_encodings.hpp>
 
-#include <gscam/gscam.h>
+#include <gscam/gscam.hpp>
 
 namespace gscam {
 

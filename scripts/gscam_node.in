@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-echo '[WARNING] gscam_node is an interim dependency and will be removed in the next release! Please change all launchfiles back to use "gscam" instead of "gscam_node"'
-
-${EXECUTABLE_OUTPUT_PATH}/gscam
