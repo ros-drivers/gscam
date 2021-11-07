@@ -1,5 +1,7 @@
 """
 Example pipeline using rclcpp_components
+
+This launches the gscam and other nodes into a container so that they run in the same process.
 """
 
 from launch import LaunchDescription
@@ -27,7 +29,7 @@ def generate_launch_description():
                     'gscam_config': gscam_config,
                     'camera_info_url': camera_info_url,
                 }],
-                # Future-proof: enable zero-copy IPC
+                # Future-proof: enable zero-copy IPC when it is available
                 # https://github.com/ros-perception/image_common/issues/212
                 extra_arguments=[{'use_intra_process_comms': True}],
             ),
