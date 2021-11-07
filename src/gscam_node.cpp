@@ -1,6 +1,6 @@
 
 #include <rclcpp/rclcpp.hpp>
-#include <gscam/gscam.h>
+#include <gscam/gscam.hpp>
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
