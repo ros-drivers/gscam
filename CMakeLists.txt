@@ -67,9 +67,10 @@ install(TARGETS gscam_node
   )
 
 install(FILES
+  examples/component_pipeline_launch.py
   examples/v4l.launch
-  examples/gscam_nodelet.launch
-  examples/nodelet_pipeline.launch
+  examples/v4ljpeg.launch
+  examples/videofile.launch
   DESTINATION share/gscam/launch
   )
 
