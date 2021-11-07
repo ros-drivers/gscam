@@ -388,12 +388,12 @@ namespace gscam {
   }
 
   void GSCam::run() {
-    while(rclcpp::ok()) {
-      if(!this->configure()) {
-        RCLCPP_FATAL(get_logger(), "Failed to configure gscam!");
-        break;
-      }
+    if(!this->configure()) {
+      RCLCPP_FATAL(get_logger(), "Failed to configure gscam!");
+      return;
+    }
 
+    while(rclcpp::ok()) {
       if(!this->init_stream()) {
         RCLCPP_FATAL(get_logger(), "Failed to initialize gscam stream!");
         break;
