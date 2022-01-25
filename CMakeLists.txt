@@ -35,15 +35,13 @@ ament_target_dependencies(gscam
   "sensor_msgs"
   "camera_calibration_parsers"
   "camera_info_manager")
-rclcpp_components_register_nodes(gscam "gscam::GSCam")
-set(node_plugins "${node_plugins}gscam::GSCam;$<TARGET_FILE:gscam>\n")
 
-add_executable(gscam_node src/gscam_node.cpp)
-target_link_libraries(gscam_node gscam
-  ${ament_LIBRARIES}
-  ${GSTREAMER_LIBRARIES}
-  ${GST_APP_LIBRARIES})
-set_target_properties(gscam_node PROPERTIES OUTPUT_NAME gscam)
+rclcpp_components_register_node(gscam
+  PLUGIN "gscam::GSCam"
+  EXECUTABLE gscam_node
+)
+
+set(node_plugins "${node_plugins}gscam::GSCam;$<TARGET_FILE:gscam>\n")
 
 ament_export_dependencies(class_loader)
 
@@ -60,10 +58,6 @@ ament_package()
 install(TARGETS gscam
   EXPORT export_gscam
   DESTINATION lib
-  )
-
-install(TARGETS gscam_node
-  DESTINATION lib/gscam
   )
 
 install(FILES
