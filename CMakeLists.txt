@@ -60,14 +60,7 @@ install(TARGETS gscam
   DESTINATION lib
   )
 
-install(FILES
-  examples/component_pipeline_launch.py
-  examples/v4l.launch
-  examples/v4ljpeg.launch
-  examples/videofile.launch
-  DESTINATION share/gscam/launch
-  )
-
-install(FILES examples/uncalibrated_parameters.ini
-  DESTINATION share/gscam/examples
-  )
+install(
+  DIRECTORY "examples"
+  DESTINATION "share/${PROJECT_NAME}"
+)
