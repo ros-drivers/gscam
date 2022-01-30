@@ -37,6 +37,7 @@ namespace gscam {
 
   GSCam::~GSCam()
   {
+    stop_signal_ = true;
     pipeline_thread_.join();
   }
 
@@ -257,7 +258,7 @@ namespace gscam {
     RCLCPP_INFO(get_logger(), "Started stream.");
 
     // Poll the data as fast a spossible
-    while(rclcpp::ok())
+    while(!stop_signal_ && rclcpp::ok())
     {
       // This should block until a new frame is awake, this way, we'll run at the
       // actual capture framerate of the device.
@@ -393,7 +394,7 @@ namespace gscam {
       return;
     }
 
-    while(rclcpp::ok()) {
+    while(!stop_signal_ && rclcpp::ok()) {
       if(!this->init_stream()) {
         RCLCPP_FATAL(get_logger(), "Failed to initialize gscam stream!");
         break;
