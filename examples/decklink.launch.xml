@@ -9,7 +9,7 @@
   <arg name="SUBDEVICE" default="0"/>
   <arg name="PUBLISH_FRAME" default="false"/>
 
-  <node namespace="decklink" name="gscam_driver_decklink" pkg="gscam" exec="gscam" output="screen">
+  <node namespace="decklink" name="gscam_driver_decklink" pkg="gscam" exec="gscam_node" output="screen">
     <param name="camera_name" value="default"/>
     <param name="camera_info_url" value="package://gscam/examples/uncalibrated_parameters.ini"/>
     <param name="gscam_config" value="decklinksrc mode=$(var MODE) connection=$(var CONNECTION) subdevice=$(var SUBDEVICE) ! videoconvert "/>
