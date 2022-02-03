@@ -64,6 +64,7 @@ namespace gscam {
 
     // Poll gstreamer on a separate thread
     std::thread pipeline_thread_;
+    std::atomic<bool> stop_signal_;
   };
 
 }

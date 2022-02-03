@@ -43,6 +43,18 @@ rclcpp_components_register_node(gscam
 
 set(node_plugins "${node_plugins}gscam::GSCam;$<TARGET_FILE:gscam>\n")
 
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest)
+  ament_add_gtest(
+    smoke_test
+    test/smoke_test.cpp
+    ENV GSCAM_CONFIG="videotestsrc pattern=snow ! capsfilter caps=video/x-raw,width=800,height=600 ! videoconvert"
+  )
+  if(TARGET smoke_test)
+    target_link_libraries(smoke_test gscam)
+  endif()
+endif()
+
 ament_export_dependencies(class_loader)
 
 ament_export_include_directories(include)
