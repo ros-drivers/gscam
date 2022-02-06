@@ -49,7 +49,7 @@ namespace gscam {
     bool gsconfig_rosparam_defined = false;
     char *gsconfig_env = NULL;
 
-    declare_parameter("gscam_config");
+    declare_parameter("gscam_config", rclcpp::ParameterType::PARAMETER_STRING);
     gsconfig_rosparam_defined = get_parameter("gscam_config",gsconfig_rosparam);
     gsconfig_env = getenv("GSCAM_CONFIG");
 
@@ -68,7 +68,7 @@ namespace gscam {
     }
 
     // Get additional gscam configuration
-    declare_parameter("sync_sink", true);
+    declare_parameter("sync_sink",  true);
     get_parameter("sync_sink", sync_sink_);
     declare_parameter("preroll", false);
     get_parameter("preroll", preroll_);
@@ -103,7 +103,7 @@ namespace gscam {
     }
 
     // Get TF Frame
-    declare_parameter("frame_id");
+    declare_parameter("frame_id", rclcpp::ParameterType::PARAMETER_STRING);
     if(!get_parameter("frame_id",frame_id_)){
       frame_id_ = "/camera_frame";
       RCLCPP_WARN_STREAM(get_logger(), "No camera frame_id set, using frame \""<<frame_id_<<"\".");
