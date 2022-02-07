@@ -1,5 +1,5 @@
 """
-Example pipeline using rclcpp_components
+Example pipeline using rclcpp_components.
 
 This launches the gscam and other nodes into a container so that they run in the same process.
 """
