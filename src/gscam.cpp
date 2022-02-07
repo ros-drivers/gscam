@@ -45,12 +45,11 @@ namespace gscam {
   {
     // Get gstreamer configuration
     // (either from environment variable or ROS param)
-    std::string gsconfig_rosparam = "";
     bool gsconfig_rosparam_defined = false;
     char *gsconfig_env = NULL;
 
-    declare_parameter("gscam_config", rclcpp::ParameterType::PARAMETER_STRING);
-    gsconfig_rosparam_defined = get_parameter("gscam_config",gsconfig_rosparam);
+    const auto gsconfig_rosparam = declare_parameter("gscam_config", "");
+    gsconfig_rosparam_defined = !gsconfig_rosparam.empty();
     gsconfig_env = getenv("GSCAM_CONFIG");
 
     if (!gsconfig_env && !gsconfig_rosparam_defined) {
@@ -68,25 +67,18 @@ namespace gscam {
     }
 
     // Get additional gscam configuration
-    declare_parameter("sync_sink",  true);
-    get_parameter("sync_sink", sync_sink_);
-    declare_parameter("preroll", false);
-    get_parameter("preroll", preroll_);
-    declare_parameter("use_gst_timestamps", false);
-    get_parameter("use_gst_timestamps", use_gst_timestamps_);
+    sync_sink_ = declare_parameter("sync_sink",  true);
+    preroll_ = declare_parameter("preroll", false);
+    use_gst_timestamps_ = declare_parameter("use_gst_timestamps", false);
 
-    declare_parameter("reopen_on_eof", false);
-    get_parameter("reopen_on_eof", reopen_on_eof_);
+    reopen_on_eof_ = declare_parameter("reopen_on_eof", false);
 
     // Get the camera parameters file
-    declare_parameter("camera_info_url", "");
-    get_parameter("camera_info_url", camera_info_url_);
-    declare_parameter("camera_name", "");
-    get_parameter("camera_name", camera_name_);
+    camera_info_url_ = declare_parameter("camera_info_url", "");
+    camera_name_ = declare_parameter("camera_name", "");
 
     // Get the image encoding
-    declare_parameter("image_encoding", std::string(sensor_msgs::image_encodings::RGB8));
-    get_parameter("image_encoding", image_encoding_);
+    image_encoding_ = declare_parameter("image_encoding", std::string(sensor_msgs::image_encodings::RGB8));
     if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
         image_encoding_ != sensor_msgs::image_encodings::MONO8 && 
         image_encoding_ != "jpeg") {
@@ -103,11 +95,9 @@ namespace gscam {
     }
 
     // Get TF Frame
-    declare_parameter("frame_id", rclcpp::ParameterType::PARAMETER_STRING);
-    if(!get_parameter("frame_id",frame_id_)){
-      frame_id_ = "/camera_frame";
+    frame_id_ = declare_parameter("frame_id", "camera_frame");
+    if(frame_id_ == "camera_frame"){
       RCLCPP_WARN_STREAM(get_logger(), "No camera frame_id set, using frame \""<<frame_id_<<"\".");
-      set_parameter({"frame_id",frame_id_});
     }
 
     return true;
