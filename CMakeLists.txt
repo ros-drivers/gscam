@@ -73,7 +73,7 @@ ament_package()
 install(TARGETS gscam
   EXPORT export_gscam
   DESTINATION lib
-  )
+)
 
 install(
   DIRECTORY "examples"
