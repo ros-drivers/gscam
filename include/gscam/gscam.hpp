@@ -1,7 +1,7 @@
 #ifndef __GSCAM_GSCAM_H
 #define __GSCAM_GSCAM_H
 
-extern "C"{
+extern "C" {
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
 }
@@ -18,54 +18,56 @@ extern "C"{
 
 #include <stdexcept>
 
-namespace gscam {
+namespace gscam
+{
 
-  class GSCam : public rclcpp::Node {
-  public:
-    GSCam(const rclcpp::NodeOptions &options);
-    ~GSCam();
+class GSCam : public rclcpp::Node
+{
+public:
+  GSCam(const rclcpp::NodeOptions & options);
+  ~GSCam();
 
-  private:
-    bool configure();
-    bool init_stream();
-    void publish_stream();
-    void cleanup_stream();
+private:
+  bool configure();
+  bool init_stream();
+  void publish_stream();
+  void cleanup_stream();
 
-    void run();
+  void run();
 
-    // General gstreamer configuration
-    std::string gsconfig_;
+  // General gstreamer configuration
+  std::string gsconfig_;
 
-    // Gstreamer structures
-    GstElement *pipeline_;
-    GstElement *sink_;
+  // Gstreamer structures
+  GstElement * pipeline_;
+  GstElement * sink_;
 
-    // Appsink configuration
-    bool sync_sink_;
-    bool preroll_;
-    bool reopen_on_eof_;
-    bool use_gst_timestamps_;
+  // Appsink configuration
+  bool sync_sink_;
+  bool preroll_;
+  bool reopen_on_eof_;
+  bool use_gst_timestamps_;
 
-    // Camera publisher configuration
-    std::string frame_id_;
-    int width_, height_;
-    std::string image_encoding_;
-    std::string camera_name_;
-    std::string camera_info_url_;
+  // Camera publisher configuration
+  std::string frame_id_;
+  int width_, height_;
+  std::string image_encoding_;
+  std::string camera_name_;
+  std::string camera_info_url_;
 
-    // ROS Inteface
-    // Calibration between ros::Time and gst timestamps
-    double time_offset_;
-    camera_info_manager::CameraInfoManager camera_info_manager_;
-    image_transport::CameraPublisher camera_pub_;
-    // Case of a jpeg only publisher
-    rclcpp::Publisher<sensor_msgs::msg::CompressedImage>::SharedPtr jpeg_pub_;
-    rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr cinfo_pub_;
+  // ROS Inteface
+  // Calibration between ros::Time and gst timestamps
+  double time_offset_;
+  camera_info_manager::CameraInfoManager camera_info_manager_;
+  image_transport::CameraPublisher camera_pub_;
+  // Case of a jpeg only publisher
+  rclcpp::Publisher<sensor_msgs::msg::CompressedImage>::SharedPtr jpeg_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr cinfo_pub_;
 
-    // Poll gstreamer on a separate thread
-    std::thread pipeline_thread_;
-    std::atomic<bool> stop_signal_;
-  };
+  // Poll gstreamer on a separate thread
+  std::thread pipeline_thread_;
+  std::atomic<bool> stop_signal_;
+};
 
 }
 
