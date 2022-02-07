@@ -51,7 +51,7 @@ TEST(SmokeTest, smoke_test)  // NOLINT
     [&](const sensor_msgs::msg::Image::ConstSharedPtr image)  // NOLINT
     {
       // Match GSCAM_CONFIG and param defaults
-      EXPECT_EQ(image->header.frame_id, "/camera_frame");
+      EXPECT_EQ(image->header.frame_id, "camera_frame");
       EXPECT_EQ(image->width, 800u);
       EXPECT_EQ(image->height, 600u);
       EXPECT_EQ(image->encoding, sensor_msgs::image_encodings::RGB8);
