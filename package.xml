@@ -9,7 +9,7 @@
   </description>
   <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
   <maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>
-  <license>BSD</license>
+  <license>Apache 2.0 License</license>
 
   <author email="jbo@jhu.edu">Jonathan Bohren</author>
   <author email="tjay@cs.brown.edu">Graylin Trevor Jay</author>
@@ -28,6 +28,9 @@
   <depend>sensor_msgs</depend>
   <depend>camera_calibration_parsers</depend>
   <depend>camera_info_manager</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

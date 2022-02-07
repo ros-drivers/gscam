@@ -1,11 +1,26 @@
+// Copyright 2022 Clyde McQueen
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <chrono>
-#include <sensor_msgs/image_encodings.hpp>
+#include <memory>
 
 #include "gscam/gscam.hpp"
 #include "gtest/gtest.h"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/node.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/image_encodings.hpp"
 #include "utils.hpp"
 
 using namespace std::chrono_literals;
@@ -36,7 +51,7 @@ TEST(SmokeTest, smoke_test)  // NOLINT
     [&](const sensor_msgs::msg::Image::ConstSharedPtr image)  // NOLINT
     {
       // Match GSCAM_CONFIG and param defaults
-      EXPECT_EQ(image->header.frame_id, "/camera_frame");
+      EXPECT_EQ(image->header.frame_id, "camera_frame");
       EXPECT_EQ(image->width, 800u);
       EXPECT_EQ(image->height, 600u);
       EXPECT_EQ(image->encoding, sensor_msgs::image_encodings::RGB8);
