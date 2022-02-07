@@ -44,6 +44,9 @@ rclcpp_components_register_node(gscam
 set(node_plugins "${node_plugins}gscam::GSCam;$<TARGET_FILE:gscam>\n")
 
 if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
   find_package(ament_cmake_gtest)
   ament_add_gtest(
     smoke_test
