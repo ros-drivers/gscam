@@ -1,22 +1,37 @@
-#ifndef __GSCAM_GSCAM_H
-#define __GSCAM_GSCAM_H
+// Copyright 2022 Jonathan Bohren, Clyde McQueen
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-extern "C" {
-#include <gst/gst.h>
-#include <gst/app/gstappsink.h>
-}
-
-#include <rclcpp/rclcpp.hpp>
-
-#include <image_transport/image_transport.hpp>
-#include <camera_info_manager/camera_info_manager.hpp>
-
-#include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/msg/compressed_image.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/srv/set_camera_info.hpp>
+#ifndef GSCAM__GSCAM_HPP_
+#define GSCAM__GSCAM_HPP_
 
 #include <stdexcept>
+#include <string>
+
+extern "C" {
+#include "gst/gst.h"
+#include "gst/app/gstappsink.h"
+}
+
+#include "rclcpp/rclcpp.hpp"
+
+#include "image_transport/image_transport.hpp"
+#include "camera_info_manager/camera_info_manager.hpp"
+
+#include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/msg/compressed_image.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "sensor_msgs/srv/set_camera_info.hpp"
 
 namespace gscam
 {
@@ -24,7 +39,7 @@ namespace gscam
 class GSCam : public rclcpp::Node
 {
 public:
-  GSCam(const rclcpp::NodeOptions & options);
+  explicit GSCam(const rclcpp::NodeOptions & options);
   ~GSCam();
 
 private:
@@ -69,6 +84,6 @@ private:
   std::atomic<bool> stop_signal_;
 };
 
-}
+}  // namespace gscam
 
-#endif // ifndef __GSCAM_GSCAM_H
+#endif  // GSCAM__GSCAM_HPP_

@@ -1,23 +1,38 @@
+// Copyright 2022 Jonathan Bohren, Clyde McQueen
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <iostream>
+#include <string>
 
 extern "C" {
-#include <gst/gst.h>
-#include <gst/app/gstappsink.h>
+#include "gst/gst.h"
+#include "gst/app/gstappsink.h"
 }
 
-#include <image_transport/image_transport.hpp>
-#include <camera_info_manager/camera_info_manager.hpp>
+#include "image_transport/image_transport.hpp"
+#include "camera_info_manager/camera_info_manager.hpp"
 
-#include <sensor_msgs/msg/image.hpp>
-#include <sensor_msgs/msg/compressed_image.hpp>
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/image_encodings.hpp>
+#include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/msg/compressed_image.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "sensor_msgs/image_encodings.hpp"
 
-#include <gscam/gscam.hpp>
+#include "gscam/gscam.hpp"
 
 namespace gscam
 {
@@ -56,20 +71,25 @@ bool GSCam::configure()
   if (!gsconfig_env && !gsconfig_rosparam_defined) {
     RCLCPP_FATAL(
       get_logger(),
-      "Problem getting GSCAM_CONFIG environment variable and 'gscam_config' rosparam is not set. This is needed to set up a gstreamer pipeline.");
+      "Problem getting GSCAM_CONFIG environment variable and "
+      "'gscam_config' rosparam is not set. This is needed to set up a gstreamer pipeline.");
     return false;
   } else if (gsconfig_env && gsconfig_rosparam_defined) {
     RCLCPP_FATAL(
       get_logger(),
-      "Both GSCAM_CONFIG environment variable and 'gscam_config' rosparam are set. Please only define one.");
+      "Both GSCAM_CONFIG environment variable and 'gscam_config' rosparam are set. "
+      "Please only define one.");
     return false;
   } else if (gsconfig_env) {
     gsconfig_ = gsconfig_env;
-    RCLCPP_INFO_STREAM(get_logger(), "Using gstreamer config from env: \"" << gsconfig_env << "\"");
+    RCLCPP_INFO_STREAM(
+      get_logger(),
+      "Using gstreamer config from env: \"" << gsconfig_env << "\"");
   } else if (gsconfig_rosparam_defined) {
     gsconfig_ = gsconfig_rosparam;
     RCLCPP_INFO_STREAM(
-      get_logger(), "Using gstreamer config from rosparam: \"" << gsconfig_rosparam << "\"");
+      get_logger(),
+      "Using gstreamer config from rosparam: \"" << gsconfig_rosparam << "\"");
   }
 
   // Get additional gscam configuration
@@ -239,8 +259,8 @@ void GSCam::publish_stream()
   if (preroll_) {
     RCLCPP_DEBUG(get_logger(), "Performing preroll...");
 
-    //The PAUSE, PLAY, PAUSE, PLAY cycle is to ensure proper pre-roll
-    //I am told this is needed and am erring on the side of caution.
+    // The PAUSE, PLAY, PAUSE, PLAY cycle is to ensure proper pre-roll
+    // I am told this is needed and am erring on the side of caution.
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     if (gst_element_get_state(pipeline_, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {
       RCLCPP_ERROR(get_logger(), "Failed to PLAY during preroll.");
@@ -283,8 +303,11 @@ void GSCam::publish_stream()
     guint8 * & buf_data = info.data;
 
     GstClockTime bt = gst_element_get_base_time(pipeline_);
-    // RCLCPP_INFO(get_logger(), "New buffer: timestamp %.6f %lu %lu %.3f",
-    //         GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_, buf->timestamp, bt, time_offset_);
+    // RCLCPP_INFO(
+    //   get_logger(),
+    //   "New buffer: timestamp %.6f %lu %lu %.3f",
+    //   GST_TIME_AS_USECONDS(buf->timestamp + bt) / 1e6 + time_offset_,
+    //   buf->timestamp, bt, time_offset_);
 
 
 #if 0
@@ -423,11 +446,10 @@ void GSCam::run()
       break;
     }
   }
-
 }
 
 // Example callbacks for appsink
-// TODO: enable callback-based capture
+// TODO(someone): enable callback-based capture
 void gst_eos_cb(GstAppSink * appsink, gpointer user_data)
 {
 }
@@ -440,7 +462,7 @@ GstFlowReturn gst_new_asample_cb(GstAppSink * appsink, gpointer user_data)
   return GST_FLOW_OK;
 }
 
-}
+}  // namespace gscam
 
 #include "rclcpp_components/register_node_macro.hpp"
 
