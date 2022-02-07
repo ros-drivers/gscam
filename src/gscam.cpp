@@ -367,7 +367,7 @@ void GSCam::publish_stream()
         RCLCPP_WARN_STREAM(
           get_logger(), "GStreamer image buffer underflow: Expected frame to be " <<
             expected_frame_size << " bytes but got only " <<
-          (buf_size) << " bytes. (make sure frames are correctly encoded)");
+            buf_size << " bytes. (make sure frames are correctly encoded)");
       }
 
       // Construct Image message
