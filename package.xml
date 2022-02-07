@@ -9,7 +9,7 @@
   </description>
   <maintainer email="jbo@jhu.edu">Jonathan Bohren</maintainer>
   <maintainer email="ros-orphaned-packages@googlegroups.com">ROS Orphaned Package Maintainers</maintainer>
-  <license>BSD</license>
+  <license>Apache 2.0 License</license>
 
   <author email="jbo@jhu.edu">Jonathan Bohren</author>
   <author email="tjay@cs.brown.edu">Graylin Trevor Jay</author>
