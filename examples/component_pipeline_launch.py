@@ -11,7 +11,7 @@ from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     gscam_config = 'videotestsrc is-live=true ! video/x-raw ! videoconvert'
-    camera_info_url='package://gscam/examples/uncalibrated_parameters.ini'
+    camera_info_url = 'package://gscam/examples/uncalibrated_parameters.ini'
 
     return LaunchDescription([ComposableNodeContainer(
         name='gscam_container',
