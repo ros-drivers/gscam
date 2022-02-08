@@ -2,7 +2,7 @@
 
 This is a ROS2 package originally developed by the [Brown Robotics
 Lab](http://robotics.cs.brown.edu/) for broadcasting any
-[GStreamer](http://gstreamer.freedesktop.org/)-based video stream via
+[GStreamer](http://gstreamer.freedesktop.org) video stream via
 [image transport](https://index.ros.org/p/image_transport/).
 
 ## GStreamer Library Support
@@ -31,6 +31,13 @@ Ubuntu install:
 sudo apt-get install gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev
 ```
 
+## License
+
+GSCam for ROS2 is licensed under the [Apache 2 license](LICENSE).
+
+Note that GStreamer is licensed under the LGPL, and GStreamer plugins have their own 
+[license requirements](https://gstreamer.freedesktop.org/documentation/plugin-development/appendix/licensing-advisory.html?gi-language=c).
+
 ## API
 
 #### Nodes
@@ -47,7 +54,7 @@ sudo apt-get install gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins
 * `camera_name`: The name of the camera (corrsponding to the camera info)
 * `camera_info_url`: A url (`file://path/to/file`, `package://pkg_name/path/to/file`) to the 
   [camera calibration file](http://www.ros.org/wiki/camera_calibration_parsers#File_formats)
-* `gscam_config`: The GStreamer [configuration string](https://github.com/matthew1000/gstreamer-cheat-sheet)
+* `gscam_config`: The GStreamer [configuration string](https://gstreamer.freedesktop.org/documentation/tools/gst-launch.html?gi-language=c#pipeline-examples)
 * `frame_id`: The [tf2](https://index.ros.org/p/tf2/) frame ID
 * `reopen_on_eof`: Re-open the stream if it ends (EOF)
 * `sync_sink`: Synchronize the app sink (sometimes setting this to `false` can resolve problems with sub-par framerates)
@@ -55,10 +62,10 @@ sudo apt-get install gstreamer1.0-tools libgstreamer1.0-dev libgstreamer-plugins
 ## Examples
 
 See the example launch files and configs in the [examples](examples) directory. These include:
-* [v4l.launch](examples/v4l.launch): Standard
-  [video4linux](http://en.wikipedia.org/wiki/Video4Linux)-based cameras like
+* [v4l.launch.xml](examples/v4l.launch.xml): Standard
+  [video4linux](http://en.wikipedia.org/wiki/Video4Linux) cameras like
   USB webcams
-* [v4ljpeg.launch](examples/v4ljpeg.launch): Same as above, but publishes 
+* [v4ljpeg.launch.xml](examples/v4ljpeg.launch.xml): Same as above, but publishes 
   [compressed images](https://docs.ros2.org/foxy/api/sensor_msgs/msg/CompressedImage.html)
-* [videofile.launch](examples/videofile.launch): Opens any videofile readable by GStreamer
+* [videofile.launch.xml](examples/videofile.launch.xml): Opens any videofile readable by GStreamer
 * [component_pipeline_launch.py](examples/component_pipeline_launch.py): Launch an image pipeline using [ROS2 composition](https://docs.ros.org/en/foxy/Tutorials/Composition.html)
