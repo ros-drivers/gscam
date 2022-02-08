@@ -15,6 +15,8 @@ GSCam supports the following versions of ROS2 and GStreamer:
 | Galactic | 20.04 | 1.16 |
 | Rolling | 20.04 | 1.16 |
 
+Note: Rolling will migrate to Ubuntu 22.04 and GStreamer 1.18 in preparation for Humble Hawksbill.
+
 #### Dependencies
 
 These dependencies will be picked up by rosdep and are required to compile:
@@ -61,10 +63,11 @@ Note that GStreamer is licensed under the LGPL, and GStreamer plugins have their
 
 ## Examples
 
-See the example launch files and configs in the [examples](examples) directory. These include:
+See example launch files and configs in the [examples](examples) directory.
+
+These examples have been tested and work well:
 * [v4l.launch.xml](examples/v4l.launch.xml): Standard
-  [video4linux](http://en.wikipedia.org/wiki/Video4Linux) cameras like
-  USB webcams
+  [video4linux](http://en.wikipedia.org/wiki/Video4Linux) cameras like USB webcams
 * [v4ljpeg.launch.xml](examples/v4ljpeg.launch.xml): Same as above, but publishes 
   [compressed images](https://docs.ros2.org/foxy/api/sensor_msgs/msg/CompressedImage.html)
 * [videofile.launch.xml](examples/videofile.launch.xml): Opens any videofile readable by GStreamer
