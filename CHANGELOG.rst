@@ -2,6 +2,41 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix: fix test dependency in package.xml
+* Add note on testing and examples
+* Update README
+* chore: fix for uncrustify
+* fix: fix smoke test
+* chore: fix copyright
+* chore: fix flake8
+* chore: fix pep257
+* chore: fix lint_cmake
+* chore: fix cpplint
+* chore: change license
+* chore: apply uncrustify
+* chore: add linter dependencies
+* chore: simplify parameter declaration
+* adding explicit parameter types to string parameters
+* Add smoke test
+* Break deadlock for a clean exit
+* fix: fix legacy group namespace
+* chore: install examples directory
+* fix: fix launch extension
+* fix: fix launch executable name
+* feat: create node exe from rclcpp components
+* Update README
+* Remove extra files, rename .h to .hpp
+* Configure once, avoids re-declaring parameters
+* Port launch files to ros2
+* Remove support for gstreamer-0.10
+* Use Github Actions and ros-tooling for CI
+* Remove deprecation warnings, clean up includes
+* Fixed crash in GStreamer 1.16.2, works on Foxy
+* Minimal ROS2 port, works in Eloquent
+* Contributors: Clyde McQueen, Jonathan Bohren, wep21
+
 1.0.1 (2018-09-06)
 ------------------
 * Merge pull request `#52 <https://github.com/ros-drivers/gscam/issues/52>`_ from k-okada/add_travis
