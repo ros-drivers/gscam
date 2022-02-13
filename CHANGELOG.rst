@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2022-02-13)
+------------------
 * fix: fix test dependency in package.xml
 * Add note on testing and examples
 * Update README
