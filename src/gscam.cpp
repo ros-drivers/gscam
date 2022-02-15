@@ -42,7 +42,8 @@ GSCam::GSCam(const rclcpp::NodeOptions & options)
   gsconfig_(""),
   pipeline_(NULL),
   sink_(NULL),
-  camera_info_manager_(this)
+  camera_info_manager_(this),
+  stop_signal_(false)
 {
   pipeline_thread_ = std::thread(
     [this]()
