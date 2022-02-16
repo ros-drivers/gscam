@@ -18,13 +18,15 @@ RUN apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-
  gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 \
  gstreamer1.0-qt5 gstreamer1.0-pulseaudio libgstreamer-plugins-base1.0-dev
 
-WORKDIR /work/gscam_ws/src
-
-RUN git clone https://github.com/ros-drivers/gscam.git -b ros2
-
 WORKDIR /work/gscam_ws
 
+# Copy package.xml for rosdep, this doesn't change often
+COPY package.xml src/
+
 RUN rosdep install -y --from-paths . --ignore-src
+
+# Copy everything for colcon build
+COPY . src/
 
 RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && colcon build"
 
