@@ -20,14 +20,10 @@ RUN apt-get install -y libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-
 
 WORKDIR /work/gscam_ws
 
-# Copy package.xml for rosdep, this doesn't change often
-COPY package.xml src/
-
-RUN rosdep install -y --from-paths . --ignore-src
-
 # Copy everything for colcon build
-COPY . src/
+COPY . src/gscam/
 
+RUN rosdep install -y --from-paths src --ignore-src
 RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && colcon build"
 
 ENV GSCAM_CONFIG='videotestsrc pattern=snow ! video/x-raw,width=1280,height=720 ! videoconvert'
