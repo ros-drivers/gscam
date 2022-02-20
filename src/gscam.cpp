@@ -133,6 +133,8 @@ bool GSCam::configure()
       "No camera frame_id set, using frame \"" << frame_id_ << "\".");
   }
 
+  use_sensor_data_qos_ = declare_parameter("use_sensor_data_qos", false);
+
   return true;
 }
 
@@ -241,12 +243,16 @@ bool GSCam::init_stream()
   }
 
   // Create ROS camera interface
+  const auto qos = use_sensor_data_qos_ ? rclcpp::SensorDataQoS() : rclcpp::QoS{1};
   if (image_encoding_ == "jpeg") {
     jpeg_pub_ =
-      create_publisher<sensor_msgs::msg::CompressedImage>("camera/image_raw/compressed", 1);
-    cinfo_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>("camera/camera_info", 1);
+      create_publisher<sensor_msgs::msg::CompressedImage>(
+      "camera/image_raw/compressed", qos);
+    cinfo_pub_ = create_publisher<sensor_msgs::msg::CameraInfo>(
+      "camera/camera_info", qos);
   } else {
-    camera_pub_ = image_transport::create_camera_publisher(this, "camera/image_raw");
+    camera_pub_ = image_transport::create_camera_publisher(
+      this, "camera/image_raw", qos.get_rmw_qos_profile());
   }
 
   return true;
