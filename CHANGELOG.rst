@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.1 (2022-02-28)
+------------------
 * feat: add yuv support (`#78 <https://github.com/ros-drivers/gscam/issues/78>`_)
   * feat: add yuv support
   * docs: add parameter description about image encodings
