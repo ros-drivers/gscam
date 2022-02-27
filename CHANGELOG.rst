@@ -2,6 +2,29 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* feat: add yuv support (`#78 <https://github.com/ros-drivers/gscam/issues/78>`_)
+  * feat: add yuv support
+  * docs: add parameter description about image encodings
+* feat: add option to use sensor data qos (`#79 <https://github.com/ros-drivers/gscam/issues/79>`_)
+  * feat: add option to use sensor data qos
+  * docs: add description about the new flag
+* Improve Dockerfile (`#77 <https://github.com/ros-drivers/gscam/issues/77>`_)
+  * Use COPY instead of git clone
+  * Copy source into gscam
+  Co-authored-by: Daisuke Nishimatsu <42202095+wep21@users.noreply.github.com>
+  * Small fixes
+  Co-authored-by: Daisuke Nishimatsu <42202095+wep21@users.noreply.github.com>
+* Merge pull request `#76 <https://github.com/ros-drivers/gscam/issues/76>`_ from clydemcqueen/ros2
+  Fix uninitialized variable, adding more CI / test infrastructure.
+* Merge pull request `#9 <https://github.com/ros-drivers/gscam/issues/9>`_ from clydemcqueen/clyde_fixes
+  Several fixes
+* feat: add Dockerfile
+* chore: support multiple CLion build envs
+* fix: initialize variable
+* Contributors: Clyde McQueen, Daisuke Nishimatsu, Jonathan Bohren
+
 2.0.0 (2022-02-13)
 ------------------
 * fix: fix test dependency in package.xml
