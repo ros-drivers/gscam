@@ -60,6 +60,7 @@ Note that GStreamer is licensed under the LGPL, and GStreamer plugins have their
 * `frame_id`: The [tf2](https://index.ros.org/p/tf2/) frame ID
 * `reopen_on_eof`: Re-open the stream if it ends (EOF)
 * `sync_sink`: Synchronize the app sink (sometimes setting this to `false` can resolve problems with sub-par framerates)
+* `image_encoding`: image encoding ("rgb8", "mono8", "yuv422", "jpeg")
 * `use_sensor_data_qos`: The flag to use sensor data qos for camera topic(image, camera_info)
 
 ## Examples
