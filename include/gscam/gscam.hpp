@@ -69,6 +69,7 @@ private:
   std::string image_encoding_;
   std::string camera_name_;
   std::string camera_info_url_;
+  bool use_sensor_data_qos_;
 
   // ROS Inteface
   // Calibration between ros::Time and gst timestamps
