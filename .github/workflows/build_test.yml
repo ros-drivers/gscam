@@ -45,6 +45,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ros_ws/src
+      - name: workaround for jammy
+        if: ${{ matrix.ros_distribution == 'humble' || matrix.ros_distribution == 'rolling' }}
+        run: |
+          sudo apt remove libunwind-14-dev -y
       - name: build and test
         uses: ros-tooling/action-ros-ci@master
         with:
