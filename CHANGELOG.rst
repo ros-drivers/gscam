@@ -2,8 +2,8 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.2 (2022-06-16)
+------------------
 * Update ROS2, Ubuntu and GStreamer versions (`#85 <https://github.com/ros-drivers/gscam/issues/85>`_)
 * fix: ros2 gstreamer timestamps (`#83 <https://github.com/ros-drivers/gscam/issues/83>`_)
   * fix: correct gstreamer timestamp offset calculation for image header timestamp
