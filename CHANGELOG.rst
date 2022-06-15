@@ -2,6 +2,18 @@
 Changelog for package gscam
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update ROS2, Ubuntu and GStreamer versions (`#85 <https://github.com/ros-drivers/gscam/issues/85>`_)
+* fix: ros2 gstreamer timestamps (`#83 <https://github.com/ros-drivers/gscam/issues/83>`_)
+  * fix: correct gstreamer timestamp offset calculation for image header timestamp
+  * docs: add use_gst_timestamps parameter to the readme file
+* ci: update docker image for latest ros distribution (`#81 <https://github.com/ros-drivers/gscam/issues/81>`_)
+  * ci: update docker image of rolling
+  * ci: add humble distribution
+  * ci: add workaround for jammy
+* Contributors: Clyde McQueen, Daisuke Nishimatsu, David Wong
+
 2.0.1 (2022-02-28)
 ------------------
 * feat: add yuv support (`#78 <https://github.com/ros-drivers/gscam/issues/78>`_)
