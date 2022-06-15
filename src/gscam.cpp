@@ -236,8 +236,8 @@ bool GSCam::init_stream()
   GstClock * clock = gst_system_clock_obtain();
   GstClockTime ct = gst_clock_get_time(clock);
   gst_object_unref(clock);
-  time_offset_ = now().seconds() - GST_TIME_AS_USECONDS(ct) / 1e6;
-  RCLCPP_INFO(get_logger(), "Time offset: %.3f", time_offset_);
+  time_offset_ = now().nanoseconds() - GST_TIME_AS_NSECONDS(ct);
+  RCLCPP_INFO(get_logger(), "Time offset: %.6f", rclcpp::Time(time_offset_).seconds());
 
   gst_element_set_state(pipeline_, GST_STATE_PAUSED);
 
@@ -353,7 +353,7 @@ void GSCam::publish_stream()
     sensor_msgs::msg::CameraInfo::SharedPtr cinfo;
     cinfo.reset(new sensor_msgs::msg::CameraInfo(cur_cinfo));
     if (use_gst_timestamps_) {
-      cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_USECONDS(buf->pts + bt) / 1e6 + time_offset_);
+      cinfo->header.stamp = rclcpp::Time(GST_TIME_AS_NSECONDS(buf->pts + bt) + time_offset_);
     } else {
       cinfo->header.stamp = now();
     }
