@@ -454,6 +454,7 @@ void GSCam::run()
       break;
     }
   }
+  rclcpp::shutdown();
 }
 
 // Example callbacks for appsink
