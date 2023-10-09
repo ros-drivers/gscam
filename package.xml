@@ -21,7 +21,6 @@
   <depend>libgstreamer-plugins-base1.0-dev</depend>
 
   <depend>class_loader</depend>
-  <depend>cv_bridge</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>image_transport</depend>
