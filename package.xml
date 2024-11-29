@@ -19,6 +19,7 @@
 
   <depend>libgstreamer1.0-dev</depend>
   <depend>libgstreamer-plugins-base1.0-dev</depend>
+  <depend>gstreamer1.0-plugins-good</depend>
 
   <depend>class_loader</depend>
   <depend>cv_bridge</depend>
