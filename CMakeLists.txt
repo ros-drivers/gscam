@@ -23,18 +23,19 @@ include_directories(
   ${GST_APP_INCLUDE_DIRS})
 
 add_library(gscam SHARED src/gscam.cpp)
-target_link_libraries(gscam
+target_link_libraries(gscam PUBLIC
   ${ament_LIBRARIES}
   ${GSTREAMER_LIBRARIES}
-  ${GST_APP_LIBRARIES})
-target_link_libraries(gscam PUBLIC
-  "class_loader"
-  "image_transport"
-  "rclcpp"
-  "rclcpp_components"
-  "sensor_msgs"
-  "camera_calibration_parsers"
-  "camera_info_manager"
+  ${GST_APP_LIBRARIES}
+  ${sensor_msgs_TARGETS}
+  camera_calibration_parsers::camera_calibration_parsers
+  camera_info_manager::camera_info_manager
+  class_loader::class_loader
+  image_transport::image_transport
+  rclcpp::rclcpp
+  rclcpp_components::component
+  rclcpp_components::component_manager
+  sensor_msgs::sensor_msgs_library
 )
 
 rclcpp_components_register_node(gscam
