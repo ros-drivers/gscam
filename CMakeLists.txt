@@ -27,14 +27,14 @@ target_link_libraries(gscam
   ${ament_LIBRARIES}
   ${GSTREAMER_LIBRARIES}
   ${GST_APP_LIBRARIES})
-ament_target_dependencies(gscam
-  "class_loader"
-  "image_transport"
-  "rclcpp"
-  "rclcpp_components"
-  "sensor_msgs"
-  "camera_calibration_parsers"
-  "camera_info_manager")
+target_link_libraries(gscam
+  class_loader::class_loader
+  image_transport::image_transport
+  rclcpp::rclcpp
+  rclcpp_components::component
+  ${std_srvs_TARGETS}
+  camera_calibration_parsers::camera_calibration_parsers
+  camera_info_manager::camera_info_manager)
 
 rclcpp_components_register_node(gscam
   PLUGIN "gscam::GSCam"
