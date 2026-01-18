@@ -359,6 +359,15 @@ void GSCam::publish_stream()
     }
     // RCLCPP_INFO(get_logger(), "Image time stamp: %.3f",cinfo->header.stamp.toSec());
     cinfo->header.frame_id = frame_id_;
+    // Set width/height from frame size if either is missing
+    if (cinfo->width == 0 || cinfo->height == 0) {
+      if (cinfo->k[0] != 0.0) {  // Signifies calibration is present
+        RCLCPP_ERROR_ONCE(get_logger(), "Calibration missing width/height");
+      }
+      cinfo->width = width_;
+      cinfo->height = height_;
+    }
+
     if (image_encoding_ == "jpeg") {
       sensor_msgs::msg::CompressedImage::SharedPtr img(new sensor_msgs::msg::CompressedImage());
       img->header = cinfo->header;
