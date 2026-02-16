@@ -42,14 +42,19 @@ GSCam::GSCam(const rclcpp::NodeOptions & options)
   gsconfig_(""),
   pipeline_(NULL),
   sink_(NULL),
+#ifdef USE_OLD_CAMERA_INFO_MANAGER
+  camera_info_manager_(this),
+#else
   camera_info_manager_(
     get_node_base_interface(),
     get_node_services_interface(),
     get_node_logging_interface(),
     "camera",
     "",
-    rclcpp::SystemDefaultsQoS(),
-    "~"),
+    rmw_qos_profile_default,
+    "~"
+  ),
+#endif
   stop_signal_(false)
 {
   pipeline_thread_ = std::thread(
