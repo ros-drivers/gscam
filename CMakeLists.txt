@@ -36,6 +36,13 @@ target_link_libraries(gscam
   camera_calibration_parsers::camera_calibration_parsers
   camera_info_manager::camera_info_manager)
 
+if(image_transport_VERSION VERSION_LESS 6.3.0)
+  target_compile_definitions(gscam
+    PUBLIC
+    USE_OLD_RMW_QOS_IMAGE_TRANSPORT=1
+  )
+endif()
+
 rclcpp_components_register_node(gscam
   PLUGIN "gscam::GSCam"
   EXECUTABLE gscam_node
