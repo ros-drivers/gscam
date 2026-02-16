@@ -32,7 +32,7 @@ target_link_libraries(gscam
   image_transport::image_transport
   rclcpp::rclcpp
   rclcpp_components::component
-  ${std_srvs_TARGETS}
+  ${sensor_msgs_TARGETS}
   camera_calibration_parsers::camera_calibration_parsers
   camera_info_manager::camera_info_manager)
 
