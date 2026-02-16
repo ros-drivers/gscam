@@ -262,7 +262,7 @@ bool GSCam::init_stream()
       this, "camera/image_raw", qos.get_rmw_qos_profile());
 #else
     camera_pub_ = image_transport::create_camera_publisher(
-       *this, "camera/image_raw", qos);
+      *this, "camera/image_raw", qos);
 #endif
   }
 
