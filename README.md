@@ -58,6 +58,7 @@ Note that GStreamer is licensed under the LGPL, and GStreamer plugins have their
 * `gscam_config`: The GStreamer [configuration string](https://gstreamer.freedesktop.org/documentation/tools/gst-launch.html?gi-language=c#pipeline-examples)
 * `frame_id`: The [tf2](https://index.ros.org/p/tf2/) frame ID
 * `reopen_on_eof`: Re-open the stream if it ends (EOF)
+* `sample_timeout_ms`: Stop waiting for a sample after this timeout in milliseconds (`0` disables the timeout). With `reopen_on_eof` enabled, the stream is reopened
 * `sync_sink`: Synchronize the app sink (sometimes setting this to `false` can resolve problems with sub-par framerates)
 * `use_gst_timestamps`: Use the GStreamer buffer timestamps for the image message header timestamps (setting this to `false` results in header timestamps being the time that the image buffer transfer is completed)
 * `image_encoding`: image encoding ("rgb8", "mono8", "yuv422", "jpeg")

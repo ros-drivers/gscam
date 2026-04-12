@@ -62,6 +62,7 @@ private:
   bool preroll_;
   bool reopen_on_eof_;
   bool use_gst_timestamps_;
+  int sample_timeout_ms_;
 
   // Camera publisher configuration
   std::string frame_id_;
