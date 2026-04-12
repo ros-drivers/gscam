@@ -97,6 +97,7 @@ bool GSCam::configure()
   sync_sink_ = declare_parameter("sync_sink", true);
   preroll_ = declare_parameter("preroll", false);
   use_gst_timestamps_ = declare_parameter("use_gst_timestamps", false);
+  sample_timeout_ms_ = declare_parameter("sample_timeout_ms", 0);
 
   reopen_on_eof_ = declare_parameter("reopen_on_eof", false);
 
@@ -302,12 +303,15 @@ void GSCam::publish_stream()
   }
   RCLCPP_INFO(get_logger(), "Started stream.");
 
+  const GstClockTime sample_timeout = sample_timeout_ms_ > 0 ?
+    static_cast<GstClockTime>(sample_timeout_ms_) * GST_MSECOND : GST_CLOCK_TIME_NONE;
+
   // Poll the data as fast a spossible
   while (!stop_signal_ && rclcpp::ok()) {
     // This should block until a new frame is awake, this way, we'll run at the
     // actual capture framerate of the device.
     // RCLCPP_DEBUG(get_logger(), "Getting data...");
-    GstSample * sample = gst_app_sink_pull_sample(GST_APP_SINK(sink_));
+    GstSample * sample = gst_app_sink_try_pull_sample(GST_APP_SINK(sink_), sample_timeout);
     if (!sample) {
       RCLCPP_ERROR(get_logger(), "Could not get gstreamer sample.");
       break;
