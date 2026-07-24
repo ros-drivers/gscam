@@ -110,6 +110,7 @@ bool GSCam::configure()
   if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&
     image_encoding_ != sensor_msgs::image_encodings::MONO8 &&
     image_encoding_ != sensor_msgs::image_encodings::YUV422 &&
+    image_encoding_ != sensor_msgs::image_encodings::RGBA8 &&
     image_encoding_ != "jpeg")
   {
     RCLCPP_FATAL_STREAM(get_logger(), "Unsupported image encoding: " + image_encoding_);
@@ -176,6 +177,11 @@ bool GSCam::init_stream()
     caps = gst_caps_new_simple(
       "video/x-raw",
       "format", G_TYPE_STRING, "UYVY",
+      NULL);
+  } else if (image_encoding_ == sensor_msgs::image_encodings::RGBA8) {
+    caps = gst_caps_new_simple(
+      "video/x-raw",
+      "format", G_TYPE_STRING, "RGBA",
       NULL);
   } else if (image_encoding_ == "jpeg") {
     caps = gst_caps_new_simple("image/jpeg", NULL, NULL);
